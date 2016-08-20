@@ -6,7 +6,7 @@ test:
 	lua ./unittest/run.lua
 
 doc:
-	ldoc -f markdown mods/at/
+	ldoc -f markdown mods/vxl/
 
 check:
-	luacheck mods/at/
+	luacheck mods/vxl/

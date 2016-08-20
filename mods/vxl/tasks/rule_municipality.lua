@@ -19,7 +19,7 @@ return {
       state.order = order.id
 
       for k,worker in pairs(loc:get_workers()) do
-        worker:push_task("build", { order = order.id })
+        worker:push_task("build_lazily", { order = order.id })
       end
 
       state.state = AWAIT_BUILD

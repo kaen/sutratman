@@ -1,4 +1,4 @@
-voxlegends
+vxl
 ===
 
 A persistent realtime procedurally generated open world multiplayer survival roguelike RPG. Well, eventually.

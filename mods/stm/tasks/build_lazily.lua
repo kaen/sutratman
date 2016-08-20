@@ -28,6 +28,7 @@ return {
         -- we've tried all surface locations at this position, move to the
         -- next adjacent position
         state.adjacent_position_index = state.adjacent_position_index + 1
+        return
       end
 
       char:push_task('move', { dest = state.surface_positions[state.surface_position_index] })

@@ -14,7 +14,7 @@ return {
       if stm.data.time < char.path_wait then return end
 
       char.path_wait = stm.data.time + PATH_WAIT_TIME
-      if stm.line_of_sight(char.pos, state.dest, stepsize) then
+      if stm.line_of_sight(char.pos, state.dest) then
         state.path = { state.dest }
       else
         state.path = char:get_path_to(state.dest)

@@ -84,13 +84,13 @@ end
 function BuildOrder:find_adjacent_positions()
   local results = { }
   for x=self.min.x-1,self.max.x+1 do
-    table.insert(vector.new(x, 0, self.min.z))
-    table.insert(vector.new(x, 0, self.max.z))
+    table.insert(results, vector.new(x, 0, self.min.z))
+    table.insert(results, vector.new(x, 0, self.max.z))
   end
 
   for z=self.min.z,self.max.z do
-    table.insert(vector.new(self.min.x, 0, z))
-    table.insert(vector.new(self.max.x, 0, z))
+    table.insert(results, vector.new(self.min.x, 0, z))
+    table.insert(results, vector.new(self.max.x, 0, z))
   end
-  return result
+  return results
 end

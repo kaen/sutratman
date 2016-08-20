@@ -4,6 +4,7 @@ Location = serializable.define('Location', function()
     pos = { x = 0, y = 0, z = 0 },
     children = { },
     ruler = nil,
+    orders = { },
     type = nil
   }
 end)
@@ -41,6 +42,26 @@ function Location:get_workers()
     end
   end
   return result
+end
+
+--- Returns true when built and ready for request_location
+-- A location is complete when it has no incomplete build orders left
+function Location:is_complete()
+  return self:get_next_order() == nil
+end
+
+--- Add an order to this Location's queue
+function Location:add_order(order)
+  table.insert(self.orders, order.id)
+end
+
+--- Get the next incomplete order to be worked on
+-- @return nil or a BuildOrder instance
+function Location:get_next_order()
+  for _,id in pairs(self.orders) do
+    local order = BuildOrder.get(id)
+    if order and not order:is_complete() then return order end
+  end
 end
 
 function Location:request_location(xsize, ysize, zsize)

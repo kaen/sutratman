@@ -30,7 +30,16 @@ return {
       state.state = REQUEST_LOCATION
 
     elseif state.state == REQUEST_LOCATION then
-      local residence = Location.get(char.municipality):request_location(7,5,7)
+      -- help build the municipality if it is not complete yet
+      local municipality = Location.get(char.municipality)
+      if not municipality:is_complete() then
+        local order = municipality:get_next_order()
+        if order then char:push_task('build_lazily', { order = order.id }) end
+        return
+      end
+
+      -- when complete, ask for a place to build a home
+      local residence = municipality:request_location(7,5,7)
       if not residence then return false end
       residence.type = Location.TYPE_RESIDENCE
       char.residence = residence.id
@@ -59,7 +68,7 @@ return {
       end)
 
       BuildOrder.register(order)
-      char:push_task("build", { order = order.id })
+      char:push_task("build_lazily", { order = order.id })
       state.state = AWAIT_RESIDENCE
 
     elseif state.state == AWAIT_RESIDENCE then

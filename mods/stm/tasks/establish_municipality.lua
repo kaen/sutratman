@@ -1,4 +1,5 @@
 local MINIMUM_SPACING = 100
+
 local function find_suitable_location(char, state, size)
   local max_variance = size / 2
   local start = MapData.get_surface_pos(MapData.random_point_near(char:get_position(), 10))
@@ -17,17 +18,16 @@ return {
   end,
   perform = function(char, state)
     local size = 15
-    local pos, y_min, y_max = find_suitable_location(char,state,size)
     local closest = Location.get_closest(char:get_position(), function(x)
         return x.type == Location.TYPE_MUNICIPALITY
     end)
 
     -- we're too close to another town, so we'll always fail to find a good spot
-    if closest and pos and vector.distance(closest:get_position(), pos) < MINIMUM_SPACING then
+    if closest and vector.distance(closest:get_position(), char:get_position()) < MINIMUM_SPACING then
       return false
     end
 
-    -- couldn't find a good spot, look again next time
+    local pos, y_min, y_max = find_suitable_location(char,state,size)
     if not pos then return end
 
     -- found a good spot
@@ -36,6 +36,16 @@ return {
     loc.min = vector.new(pos.x - size, y_min, pos.z - size)
     loc.max = vector.new(pos.x + size, y_max, pos.z + size)
     Location.register(loc)
+
+    local build_fn = function(x,y,z)
+      if y >= loc.pos.y then return 'air' end
+      return 'default:dirt'
+    end
+
+    -- create initial build orders for this location
+    local order = BuildOrder.create(loc.min, loc.max, build_fn)
+    BuildOrder.register(order)
+    loc:add_order(order)
 
     -- assign the founder as the ruler
     loc.ruler = char.id

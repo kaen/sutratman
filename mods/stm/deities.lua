@@ -35,7 +35,7 @@ end
 -- Deities can seed the world with mortals created to manifest their will in
 -- the physical realm
 function Deity:create_mortals()
-  local count = 10 + math.random(10)
+  local count = 5 + math.random(5)
   local eden = self:pick_eden()
   local char
   for i=1,count do

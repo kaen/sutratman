@@ -44,7 +44,14 @@ end
 --- Perform all simulation for this character.
 -- @param dt time in game seconds to simulate
 function Character:simulate(dt)
-  self:perform_tasks(dt)
+  local ok, err = pcall(function()
+    self:perform_tasks(dt)
+  end)
+
+  if not ok then
+    print('error performing task', err)
+    stm.dump(self.tasks)
+  end
   self:update_physics(dt)
 end
 

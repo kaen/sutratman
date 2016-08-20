@@ -18,16 +18,14 @@ function History.materialize()
   end
 end
 
--- simulates n days of history from the current state
+--- simulates n game seconds of history from the current state
+-- simulation is done in fixed size chunks equal to `stm.TIME_SCALE / 60`
+-- which equates to 1/60 of a real time second at standard scaling.
 function History.simulate(n)
-  local secondsLeft = History.game_to_real(n*24*60*60)
-
-  -- in general we want to simulate 1/60 of a second in real time
-  local step = 1/60
-
-  while secondsLeft > 0 do
+  local step = stm.TIME_SCALE / 60
+  while n > 0 do
     History.step(step)
-    secondsLeft = secondsLeft - step
+    n = n - step
   end
 end
 
@@ -39,10 +37,10 @@ function History.real_to_game(t)
   return t * stm.TIME_SCALE
 end
 
+--- Perform a single step of length `dt`
+-- @param dt number of game seconds to simulate
 function History.step(dt)
   stm.data.set_node_queue = { }
-  -- convert dt from standard real time to game time
-  dt = dt * stm.TIME_SCALE
   stm.data.time = stm.data.time + dt
 
   for k,char in pairs(Character.all()) do
@@ -61,6 +59,6 @@ if minetest then
       v:materialize()
     end
     print("materialized")
-    minetest.register_globalstep(History.step)
+    minetest.register_globalstep(function(dt) History.simulate(History.real_to_game(dt)) end)
   end)
 end

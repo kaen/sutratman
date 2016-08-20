@@ -5,7 +5,7 @@ function TestHistory:testPopulate()
 end
 
 function TestHistory:testSimulate()
-  local sim_time = 0.05
+  local sim_time = 0.05 *24*60*60
   -- TODO: uncomment this line when physics stop being screwy
   -- MapData.get_node = MapData.get_node_mock_wavy
 
@@ -45,5 +45,5 @@ function TestHistory:testSimulate()
   end
 
   -- check that the expected amount of time has passed (within 1 game second)
-  assert(math.abs(stm.data.time - sim_time*24*60*60) < 1)
+  assert(math.abs(stm.data.time - sim_time) < 1)
 end

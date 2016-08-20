@@ -60,72 +60,76 @@ end
 function Character:update_physics(dt)
   -- local node = MapData.get_node(self.pos)
   local node = MapData.get_node(self.pos)
-  local tmp = vector.new(self.pos.x, self.pos.y, self.pos.z)
 
   -- -- TODO: better unsticking logic
+  self.on = node
   if stm.is_solid(node) then
-    self.pos.y = (MapData.get_surface_pos(self.pos) or vector.new(0,0,0)).y + 0.52
+    self.pos.y = (MapData.get_surface_pos(self.pos) or vector.new(0,0,0)).y - 0.50
     self.on_ground = false
     self.acceleration.y = 0
     self.velocity.y = 0
     return
   end
 
-  local node_below = MapData.get_node(vector.new(tmp.x, tmp.y - 1, tmp.z))
-  local old = vector.new(tmp.x, tmp.y, tmp.z)
-
-  self.velocity = vector.add(self.velocity, vector.multiply(self.acceleration, dt))
-  tmp = vector.add(tmp, vector.multiply(self.velocity, dt))
-  local new = vector.new(tmp.x, tmp.y, tmp.z)
+  local node_below = MapData.get_node(vector.new(self.pos.x, self.pos.y - 1, self.pos.z))
+  self.below = node_below
+  local old = vector.new(self.pos.x, self.pos.y, self.pos.z)
+  local old_node_pos = stm.float_to_node(old)
 
   self.on_ground = true
-  if not stm.is_solid(node_below) then
+  if old_node_pos.y - old.y < 0.50 or not stm.is_solid(node_below) then
     self.acceleration.y = -10 / stm.TIME_SCALE
     self.on_ground = false
   else
     self.acceleration.y = math.max(0, self.acceleration.y)
     self.velocity.y = math.max(0, self.velocity.y)
-    tmp.y = math.floor(tmp.y) + 0.52
+    self.pos.y = old_node_pos.y - 0.50
   end
 
+  self.velocity = vector.add(self.velocity, vector.multiply(self.acceleration, dt))
+  self.pos = vector.add(self.pos, vector.multiply(self.velocity, dt))
+  local new = vector.new(self.pos.x, self.pos.y, self.pos.z)
+
   -- check for collisions when moving to new voxel
-  local xmove = math.floor(old.x-0.5) ~= math.floor(new.x-0.5)
-  local ymove = math.floor(old.y-0.5) ~= math.floor(new.y-0.5)
-  local zmove = math.floor(old.z-0.5) ~= math.floor(new.z-0.5)
+  local new_node_pos = stm.float_to_node(new)
+  local xmove = old_node_pos.x ~= new_node_pos.x
+  local ymove = old_node_pos.y ~= new_node_pos.y
+  local zmove = old_node_pos.z ~= new_node_pos.z
   if xmove or ymove or zmove then
     local new_node = MapData.get_node(new)
+    self.new = new_node
     if stm.is_solid(new_node) then
       -- TODO: better jumping
-      if self.on_ground then
+      if self.on_ground and (xmove or zmove) then
         local new_node_above = MapData.get_node(vector.new(new.x, new.y + 1, new.z))
+        self.new_above = new_node_above
         if not stm.is_solid(new_node_above) then
           self.acceleration.y = 0
-          self.velocity.y = 20 / stm.TIME_SCALE
+          self.velocity.y = 10 * stm.TIME_SCALE
+          self.pos.y = self.pos.y + 1
+          self.on_ground = false
+          return
         end
       end
 
       -- check y first since we can jump over nodes
       if ymove then
         self.velocity.y = 0
-        tmp.y = old.y
+        self.pos.y = old.y
         new.y = old.y
       end
 
       if xmove then
         self.velocity.x = 0
-        tmp.x = old.x
+        self.pos.x = old.x
       end
 
       if zmove then
         self.velocity.z = 0
-        tmp.z = old.z
+        self.pos.z = old.z
       end
     end
   end
-
-  self.pos.x = tmp.x
-  self.pos.y = tmp.y
-  self.pos.z = tmp.z
 end
 
 --- Perform the current task for this character.
@@ -254,6 +258,9 @@ if _G.minetest then
     end,
     on_activate = function(self, data)
       self.char_id = tonumber(data)
+    end,
+    on_rightclick = function(self, clicker)
+      stm.dump(self:get_char())
     end,
     get_char = function(self)
       if not self.char_id then return nil end

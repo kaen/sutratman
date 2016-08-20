@@ -1,6 +1,6 @@
 local PATH = 1
 local TRAVEL = 2
-local MAX_BLOCKED_FRAMES = 30
+local MAX_BLOCKED_FRAMES = 60
 local PATH_WAIT_TIME = 3 * stm.TIME_SCALE
 return {
   plan = function(char, state)
@@ -52,7 +52,7 @@ return {
         char:move_to(waypoint)
       end
 
-      if stm.close_to(state.last, char.pos, 0.1) then
+      if stm.close_to(state.last, char.pos, 1) then
         state.blocked_frames = state.blocked_frames + 1
         if state.blocked_frames > MAX_BLOCKED_FRAMES then
           state.state = PATH

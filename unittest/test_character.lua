@@ -83,9 +83,24 @@ function TestCharacter:testJumping()
   end
 
   for t=0,10000,step do
+
     c:move_to(dest_pos)
     c:simulate(step)
   end
 
   assert(stm.close_to(c.pos, dest_pos, 1))
+end
+
+function TestCharacter:testGravity()
+  local c = Character.new()
+  local i, j
+  c.pos = vector.new(0,10,0)
+  local step = History.real_to_game(1/60) 
+
+  for t=0,10000,step do
+    c:simulate(step)
+  end
+
+  print(c.pos.y)
+  assert(math.abs(c.pos.y - 0.52) < 0.0001)
 end

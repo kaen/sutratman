@@ -23,12 +23,12 @@ if minetest then
 end
 
 -- time in in-game seconds since the simulation started
-vxl = { }
-vxl.data = vxl.data or { }
-vxl.data.time = vxl.data.time or 0
+stm = { }
+stm.data = stm.data or { }
+stm.data.time = stm.data.time or 0
 
 -- The baseline scaling between real time and game time. The tricky part is to
 -- keep things like movement speed and attack frequency looking correct on the
 -- real timescale while keeping things like building a city roughly correct on
 -- the game timescale.
-vxl.TIME_SCALE = 30.0
+stm.TIME_SCALE = 30.0

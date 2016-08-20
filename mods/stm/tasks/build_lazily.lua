@@ -54,7 +54,7 @@ return {
       state.state = WORK
 
     elseif state.state == WORK then
-      table.insert(vxl.data.set_node_queue, {pos = state.task.pos, node = { name = state.task.name }})
+      table.insert(stm.data.set_node_queue, {pos = state.task.pos, node = { name = state.task.name }})
       state.state = GET_TASK
 
     end

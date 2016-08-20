@@ -16,7 +16,7 @@ end)
 
 --- Put an initial batch of characters into the world.
 function Character.populate()
-  local creator_deity = vxl.pick_one_from_hash(Deity.all())
+  local creator_deity = stm.pick_one_from_hash(Deity.all())
   local eden = creator_deity:pick_eden()
   local count = 10 + math.random(10)
   for i=1,count do
@@ -56,7 +56,7 @@ function Character:update_physics(dt)
   local tmp = vector.new(self.pos.x, self.pos.y, self.pos.z)
 
   -- -- TODO: better unsticking logic
-  if vxl.is_solid(node) then
+  if stm.is_solid(node) then
     self.pos.y = (MapData.get_surface_pos(self.pos) or vector.new(0,0,0)).y + 0.52
     self.on_ground = false
     self.acceleration.y = 0
@@ -72,8 +72,8 @@ function Character:update_physics(dt)
   local new = vector.new(tmp.x, tmp.y, tmp.z)
 
   self.on_ground = true
-  if not vxl.is_solid(node_below) then
-    self.acceleration.y = -10 / vxl.TIME_SCALE
+  if not stm.is_solid(node_below) then
+    self.acceleration.y = -10 / stm.TIME_SCALE
     self.on_ground = false
   else
     self.acceleration.y = math.max(0, self.acceleration.y)
@@ -87,13 +87,13 @@ function Character:update_physics(dt)
   local zmove = math.floor(old.z-0.5) ~= math.floor(new.z-0.5)
   if xmove or ymove or zmove then
     local new_node = MapData.get_node(new)
-    if vxl.is_solid(new_node) then
+    if stm.is_solid(new_node) then
       -- TODO: better jumping
       if self.on_ground then
         local new_node_above = MapData.get_node(vector.new(new.x, new.y + 1, new.z))
-        if not vxl.is_solid(new_node_above) then
+        if not stm.is_solid(new_node_above) then
           self.acceleration.y = 0
-          self.velocity.y = 20 / vxl.TIME_SCALE
+          self.velocity.y = 20 / stm.TIME_SCALE
         end
       end
 
@@ -157,7 +157,7 @@ function Character:get_path_to(pos)
   pos.x = pos.x
   pos.y = pos.y
   pos.z = pos.z
-  return minetest.find_path(vxl.float_to_node(self.pos), pos, 10, 1, 3, 'A*')
+  return minetest.find_path(stm.float_to_node(self.pos), pos, 10, 1, 3, 'A*')
 end
 
 --- Add a task definition to the end of the task queue
@@ -184,12 +184,12 @@ end
 --   meters per gamesecond
 function Character:get_walk_speed()
   -- roughly three meters per (standard realtime) second
-  return 3 / vxl.TIME_SCALE
+  return 3 / stm.TIME_SCALE
 end
 
 --- Create the minetest entity that represents this character.
 function Character:materialize()
-  local entity = minetest.add_entity(self.pos, 'vxl:character')
+  local entity = minetest.add_entity(self.pos, 'stm:character')
   entity:get_luaentity().char_id = self.id
 end
 
@@ -219,7 +219,7 @@ function Character:stop()
 end
 
 if _G.minetest then
-  minetest.register_entity('vxl:character', {
+  minetest.register_entity('stm:character', {
     hp_max = 1,
     physical = false,
     weight = 5,

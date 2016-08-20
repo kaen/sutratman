@@ -12,7 +12,7 @@ local function unserialize(data)
 end
 
 local function get_uuid()
-  return vxl.get_uuid()
+  return stm.get_uuid()
 end
 
 --- Define a serializable class.
@@ -41,7 +41,7 @@ function serializable.define(name, initializer)
   -- @param o Table instance attributes for the new object
   klass.new = function(o)
     o = o or { }
-    if not o.id then o.id = vxl.get_uuid() end
+    if not o.id then o.id = stm.get_uuid() end
     for k,v in pairs(initializer()) do
       if o[k] == nil then o[k] = v end
     end

@@ -1,7 +1,7 @@
 TestHistory = {}
 function TestHistory:testPopulate()
   History:populate()
-  assert(vxl.count_pairs(Character.all()) > 10)
+  assert(stm.count_pairs(Character.all()) > 10)
 end
 
 function TestHistory:testSimulate()
@@ -24,7 +24,7 @@ function TestHistory:testSimulate()
 
   -- there should be at least 10 characters in the world, and all should be
   -- residents of this town
-  assert(vxl.count_pairs(Character.all()) > 10)
+  assert(stm.count_pairs(Character.all()) > 10)
   for k,v in pairs(Character.all()) do
     assertEquals(v.municipality, town.id)
     if town.ruler ~= v.id then assert(v.residence) end
@@ -40,6 +40,6 @@ function TestHistory:testSimulate()
   local variance, y_min, y_max = MapData.get_surface_variance(min, max)
 
   -- check that the expected amount of time has passed (within 1 game second)
-  assert(math.abs(vxl.data.time - sim_time*24*60*60) < 1)
+  assert(math.abs(stm.data.time - sim_time*24*60*60) < 1)
   -- assert(variance == 0)
 end

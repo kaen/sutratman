@@ -57,7 +57,7 @@ function Location:request_location(xsize, ysize, zsize)
       ok = true
       for k, id in pairs(self.children) do
         other = Location.get(id)
-        if vxl.rectangles_overlap(min,max,other.min,other.max) then
+        if stm.rectangles_overlap(min,max,other.min,other.max) then
           ok = false
           break
         end

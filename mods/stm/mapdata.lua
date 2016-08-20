@@ -1,10 +1,10 @@
-vxl.MAP_BLOCK_SIZE = 80
-vxl.XSIZE = vxl.MAP_BLOCK_SIZE * 1
-vxl.YSIZE = vxl.MAP_BLOCK_SIZE * 1
-vxl.ZSIZE = vxl.MAP_BLOCK_SIZE * 1
-vxl.data.map = {
+stm.MAP_BLOCK_SIZE = 80
+stm.XSIZE = stm.MAP_BLOCK_SIZE * 1
+stm.YSIZE = stm.MAP_BLOCK_SIZE * 1
+stm.ZSIZE = stm.MAP_BLOCK_SIZE * 1
+stm.data.map = {
   block_offset = nil,
-  expected_blocks = vxl.XSIZE * vxl.YSIZE * vxl.ZSIZE * 8 / math.pow(vxl.MAP_BLOCK_SIZE, 3),
+  expected_blocks = stm.XSIZE * stm.YSIZE * stm.ZSIZE * 8 / math.pow(stm.MAP_BLOCK_SIZE, 3),
   generated_blocks = 0,
   generation_callbacks_fired = false
 }
@@ -24,9 +24,9 @@ function MapData.get_surface_pos(p)
 
   local fn = function(pos, name, cid)
     if pos.y > best_pos.y then
-      if vxl.is_solid({ name = name, cid = cid }) then
+      if stm.is_solid({ name = name, cid = cid }) then
         local node_above = MapData.get_node(vector.new(pos.x, pos.y+1, pos.z))
-        if not vxl.is_solid(node_above) then
+        if not stm.is_solid(node_above) then
           best_pos = pos
         end
       end
@@ -46,9 +46,9 @@ function MapData.get_all_surface_pos(p)
   local results = { }
 
   local fn = function(pos, name, cid)
-    if vxl.is_solid({ name = name, cid = cid }) then
+    if stm.is_solid({ name = name, cid = cid }) then
       local node_above = MapData.get_node(vector.new(pos.x, pos.y+1, pos.z))
-      if not vxl.is_solid(node_above) then
+      if not stm.is_solid(node_above) then
         table.insert(results, vector.new(pos.x, pos.y + 1, pos.z))
       end
     end
@@ -164,25 +164,25 @@ function MapData.get_surface_variance(min, max)
 end
 
 function MapData.get_extents()
-  local offset = vxl.data.map.block_offset
+  local offset = stm.data.map.block_offset
   local min = {
-    x = -vxl.XSIZE + offset.x,
-    y = -vxl.YSIZE + offset.y,
-    z = -vxl.ZSIZE + offset.z
+    x = -stm.XSIZE + offset.x,
+    y = -stm.YSIZE + offset.y,
+    z = -stm.ZSIZE + offset.z
   }
 
   local max = {
-    x = vxl.XSIZE + offset.x,
-    y = vxl.YSIZE + offset.y,
-    z = vxl.ZSIZE + offset.z
+    x = stm.XSIZE + offset.x,
+    y = stm.YSIZE + offset.y,
+    z = stm.ZSIZE + offset.z
   }
 
   return min, max
 end
 
 function MapData.on_generated(minp, maxp, blockseed)
-  if type(vxl.data.map.block_offset) ~= 'table' then
-    vxl.data.map.block_offset = {
+  if type(stm.data.map.block_offset) ~= 'table' then
+    stm.data.map.block_offset = {
       x = minp.x % 80,
       y = minp.y % 80,
       z = minp.z % 80
@@ -197,11 +197,11 @@ function MapData.on_generated(minp, maxp, blockseed)
      minp.z >= min_extent.z and
      maxp.z <= max_extent.z
   then
-    vxl.data.map.generated_blocks = 1 + vxl.data.map.generated_blocks
+    stm.data.map.generated_blocks = 1 + stm.data.map.generated_blocks
   end
 
-  if vxl.data.map.generated_blocks == vxl.data.map.expected_blocks and not vxl.data.map.generation_callbacks_fired then
-    vxl.data.map.generation_callbacks_fired = true
+  if stm.data.map.generated_blocks == stm.data.map.expected_blocks and not stm.data.map.generation_callbacks_fired then
+    stm.data.map.generation_callbacks_fired = true
     for _, callback in ipairs(MapData.generation_callbacks) do
       callback()
     end

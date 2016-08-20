@@ -2,9 +2,9 @@ TestMapData = {}
 
 function TestMapData:testMapGenerationWatchdog()
   -- reset the state to thwart the global mapdata and on_generated mocking
-  vxl = nil
+  stm = nil
   minetest = nil
-  dofile("mods/vxl/init.lua")
+  dofile("mods/stm/init.lua")
 
   local generated_blocks = fixture('generated_blocks')
   local done = false

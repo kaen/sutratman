@@ -1,14 +1,14 @@
 -- Simulates a history of the world after mapgen
 History = { }
 function History:populate()
-  if not vxl.data.history then
+  if not stm.data.history then
     Deity:populate()
 
     for k,deity in pairs(Deity.all()) do
       deity:create_mortals()
     end
 
-    vxl.data.history = { }
+    stm.data.history = { }
   end
 end
 
@@ -32,24 +32,24 @@ function History.simulate(n)
 end
 
 function History.game_to_real(t)
-  return t / vxl.TIME_SCALE
+  return t / stm.TIME_SCALE
 end
 
 function History.real_to_game(t)
-  return t * vxl.TIME_SCALE
+  return t * stm.TIME_SCALE
 end
 
 function History.step(dt)
-  vxl.data.set_node_queue = { }
+  stm.data.set_node_queue = { }
   -- convert dt from standard real time to game time
-  dt = dt * vxl.TIME_SCALE
-  vxl.data.time = vxl.data.time + dt
+  dt = dt * stm.TIME_SCALE
+  stm.data.time = stm.data.time + dt
 
   for k,char in pairs(Character.all()) do
     char:simulate(dt)
   end
 
-  for k,v in pairs(vxl.data.set_node_queue) do
+  for k,v in pairs(stm.data.set_node_queue) do
     MapData.set_node(v.pos, v.node)
   end
 end

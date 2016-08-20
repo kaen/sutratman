@@ -9,9 +9,9 @@ end)
 Task.defs = { }
 
 function Task.loadDefs()
-  local path = 'mods/vxl/tasks/'
+  local path = 'mods/stm/tasks/'
   if _G.minetest then
-    path = minetest.get_modpath("vxl") .. "/tasks/"
+    path = minetest.get_modpath("stm") .. "/tasks/"
   end
   local list = io.popen('ls -1 ' .. path)
   local basename

@@ -15,8 +15,8 @@ local SOURCES = {
 
 for _, name in ipairs(SOURCES) do
   if minetest then
-    dofile(minetest.get_modpath('vxl') .. "/" .. name)
+    dofile(minetest.get_modpath('stm') .. "/" .. name)
   else
-    dofile('./mods/vxl/' .. name)
+    dofile('./mods/stm/' .. name)
   end
 end

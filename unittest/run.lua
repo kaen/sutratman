@@ -37,9 +37,9 @@ for k,v in pairs(_G) do
             local oldFunction = v.setUp
             v.setUp = function(self)
                 -- blow away anything that might retain state between cases
-                vxl = nil
+                stm = nil
                 minetest = nil
-                dofile("mods/vxl/init.lua")
+                dofile("mods/stm/init.lua")
 
                 for name in fs.dir("unittest/mocks") do
                     start, stop = name:find('mock')

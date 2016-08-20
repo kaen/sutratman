@@ -11,7 +11,7 @@ BuildOrder = serializable.define('BuildOrder', function()
 end)
 
 -- wait N standard realtime seconds before a task can be reclaimed
-local TASK_TIMEOUT = 3 * vxl.TIME_SCALE
+local TASK_TIMEOUT = 3 * stm.TIME_SCALE
 
 --- Creates a build order from a schematic function.
 -- @param min vector for the bounding rectangle's min point
@@ -40,7 +40,7 @@ end
 function BuildOrder:push(pos, name)
   self.total = self.total + 1
   self.remaining = self.remaining + 1
-  local id = vxl.get_uuid()
+  local id = stm.get_uuid()
   self.spec[id] = { pos = pos, name = name, id = id }
 end
 
@@ -50,7 +50,7 @@ function BuildOrder:take_task(pos)
   local best_dist = math.huge
   local best_task = nil
   for k,task in pairs(self.spec) do
-    if not task.taken or vxl.data.time - task.taken > TASK_TIMEOUT then
+    if not task.taken or stm.data.time - task.taken > TASK_TIMEOUT then
       local dist = vector.subtract(pos, task.pos)
       local dist_squared = dist.x * dist.x + dist.z * dist.z
       if dist_squared < best_dist then
@@ -61,7 +61,7 @@ function BuildOrder:take_task(pos)
   end
 
   if not best_task then return end
-  best_task.taken = vxl.data.time
+  best_task.taken = stm.data.time
   return best_task
 end
 

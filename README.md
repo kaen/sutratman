@@ -1,5 +1,7 @@
-vxl
+sutratman
 ===
+
+https://en.wikipedia.org/wiki/Sutram
 
 A persistent realtime procedurally generated open world multiplayer survival roguelike RPG. Well, eventually.
 

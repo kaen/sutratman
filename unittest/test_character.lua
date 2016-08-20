@@ -50,7 +50,7 @@ function TestCharacter:testCollision()
     c:simulate(step)
   end
 
-  assert(vxl.close_to(c.pos, wall_pos, 1))
+  assert(stm.close_to(c.pos, wall_pos, 1))
 end
 
 function TestCharacter:testPathing()
@@ -65,7 +65,7 @@ function TestCharacter:testPathing()
     c:simulate(step)
   end
 
-  assert(vxl.close_to(c.pos, dest_pos, 1))
+  assert(stm.close_to(c.pos, dest_pos, 1))
 end
 
 
@@ -87,5 +87,5 @@ function TestCharacter:testJumping()
     c:simulate(step)
   end
 
-  assert(vxl.close_to(c.pos, dest_pos, 1))
+  assert(stm.close_to(c.pos, dest_pos, 1))
 end

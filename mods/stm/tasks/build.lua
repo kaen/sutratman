@@ -51,7 +51,7 @@ return {
     elseif state.state == WORK then
       -- if the move was successful, do work
       if char.last_task_result then
-        table.insert(vxl.data.set_node_queue, {pos = state.task.pos, node = { name = state.task.name }})
+        table.insert(stm.data.set_node_queue, {pos = state.task.pos, node = { name = state.task.name }})
         state.state = GET_TASK
       else
         -- if we couldn't path there, try the next surface location

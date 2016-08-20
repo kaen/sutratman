@@ -101,6 +101,5 @@ function TestCharacter:testGravity()
     c:simulate(step)
   end
 
-  print(c.pos.y)
-  assert(math.abs(c.pos.y - 0.52) < 0.0001)
+  assert(math.abs(c.pos.y - 0.5) < 0.0001)
 end

@@ -55,6 +55,7 @@ function Character:simulate(dt)
   self:update_physics(dt)
 end
 
+local PHYSICS_FUZZ = 0.01
 --- Perform physics simulation for this character.
 -- @param dt time in game seconds to simulate
 function Character:update_physics(dt)
@@ -64,7 +65,7 @@ function Character:update_physics(dt)
   -- -- TODO: better unsticking logic
   self.on = node
   if stm.is_solid(node) then
-    self.pos.y = (MapData.get_surface_pos(self.pos) or vector.new(0,0,0)).y - 0.50
+    self.pos.y = (MapData.get_surface_pos(self.pos) or vector.new(0,0,0)).y - 0.50 + PHYSICS_FUZZ
     self.on_ground = false
     self.acceleration.y = 0
     self.velocity.y = 0
@@ -77,13 +78,13 @@ function Character:update_physics(dt)
   local old_node_pos = stm.float_to_node(old)
 
   self.on_ground = true
-  if old_node_pos.y - old.y < 0.50 or not stm.is_solid(node_below) then
+  if old_node_pos.y - old.y < 0.50 - PHYSICS_FUZZ or not stm.is_solid(node_below) then
     self.acceleration.y = -10 / stm.TIME_SCALE
     self.on_ground = false
   else
     self.acceleration.y = math.max(0, self.acceleration.y)
     self.velocity.y = math.max(0, self.velocity.y)
-    self.pos.y = old_node_pos.y - 0.50
+    self.pos.y = old_node_pos.y - 0.50 + PHYSICS_FUZZ
   end
 
   self.velocity = vector.add(self.velocity, vector.multiply(self.acceleration, dt))

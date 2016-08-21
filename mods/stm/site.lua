@@ -44,7 +44,7 @@ function Site:get_workers()
   return result
 end
 
---- Returns true when built and ready for request_site
+--- Returns true when built and ready for request_space
 -- A site is complete when it has no incomplete build orders left
 function Site:is_complete()
   return self:get_next_order() == nil
@@ -64,16 +64,23 @@ function Site:get_next_order()
   end
 end
 
-function Site:request_site(xsize, ysize, zsize)
+--- Request space in this site for the given child site
+-- If space is found, then the appropriate values for the new location are set
+-- for `pos`, `min`, and `max` in `child`. If the function does not return
+-- true, `child` is unmodified
+-- @param child the child Site instance
+-- @param size a vector specifying the space needed
+-- @return true when space was found
+function Site:request_space(child, size)
   local min = vector.new(0,self.pos.y,0)
-  local max = vector.new(0,self.pos.y + ysize - 1,0)
+  local max = vector.new(0,self.pos.y + size.y - 1,0)
   local ok, other
-  for x = self.min.x,(self.max.x-xsize+1) do
-    for z = self.min.z,(self.max.z-zsize+1) do
+  for x = self.min.x,(self.max.x-size.x+1) do
+    for z = self.min.z,(self.max.z-size.z+1) do
       min.x = x
       min.z = z
-      max.x = x + xsize - 1
-      max.z = z + zsize - 1
+      max.x = x + size.x - 1
+      max.z = z + size.z - 1
 
       ok = true
       for k, id in pairs(self.children) do
@@ -85,17 +92,15 @@ function Site:request_site(xsize, ysize, zsize)
       end
 
       if ok then
-        local result = Site.new()
-        Site.register(result)
-        result.pos = vector.new(
+        child.pos = vector.new(
           math.floor(min.x + (max.x - min.x)/2),
           math.floor(min.y),
           math.floor(min.z + (max.z - min.z)/2)
         )
-        result.min = min
-        result.max = max
-        table.insert(self.children, result.id)
-        return result
+        child.min = min
+        child.max = max
+        table.insert(self.children, child.id)
+        return true
       end
     end
   end

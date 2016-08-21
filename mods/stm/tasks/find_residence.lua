@@ -31,10 +31,14 @@ return {
 
     elseif state.state == REQUEST_LOCATION then
       -- when complete, ask for a place to build a home
-      local residence = Site.get(char.municipality):request_site(7,5,7)
-      if not residence then return false end
+      local residence = Site.new()
       residence.type = Race.get(char.race).residence_type
+      local size = residence:pick_style()
+      local found_space = Site.get(char.municipality):request_space(residence, size)
+      if not found_space then return false end
+
       residence:create_initial_build_orders()
+      Site.register(residence)
       char.residence = residence.id
       char:push_task('construct_site', { site = residence.id })
       state.state = AWAIT_RESIDENCE

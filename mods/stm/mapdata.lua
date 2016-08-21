@@ -207,9 +207,15 @@ function MapData.on_generated(minp, maxp, blockseed)
   end
 end
 
+function MapData.dump_registered_nodes()
+  file = io.open('registered_nodes.lua', "w")
+  if file then
+    file:write(minetest.serialize(minetest.registered_nodes))
+    io.close(file)
+  end
+end
+
 if minetest then
   minetest.register_on_generated(MapData.on_generated)
-  -- minetest.after(0, function()
-  --   MapData.get_surface_pos({x = 0, y = 0, z = 0})
-  -- end)
+  -- minetest.after(0, MapData.dump_registered_nodes)
 end

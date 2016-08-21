@@ -188,6 +188,11 @@ function stm.get_blueprint_data(a, b, name)
   return data
 end
 
+function stm.schematic_size(name)
+  local s = dofile(stm.base_path .. "/schematics/" .. name .. ".lua")
+  return s.size
+end
+
 local min_value = -math.floor(0xFFFF/2)
 local bit_spacing = 0x10000
 function stm.pos_to_int(pos)

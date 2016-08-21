@@ -18,4 +18,11 @@ function Race:get_def()
   return Race.defs[self.name]
 end
 
+-- defer to the race definition
+local old_index = Race.__index
+Race.__index = function(t,k)
+  if old_index[k] then return old_index[k] end
+  return t:get_def()[k]
+end
+
 Race.defs = stm.load_directory('races')

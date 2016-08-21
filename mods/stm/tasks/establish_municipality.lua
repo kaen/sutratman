@@ -14,7 +14,7 @@ return {
       return false
     end
 
-    local site = Site.new({ type = 'municipality_human' })
+    local site = Site.new({ type = Race.get(char.race).municipality_type })
     if not site:find_suitable_location(char:get_position()) then
       -- Couldn't find a good spot, return without registering the site
       return

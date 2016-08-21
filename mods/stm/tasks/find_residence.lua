@@ -23,10 +23,6 @@ return {
       end
 
       char.municipality = loc.id
-      char:push_task('move', { dest = loc:get_position(), distance = 5 })
-      state.state = MOVE
-
-    elseif state.state == MOVE then
       state.state = REQUEST_LOCATION
 
     elseif state.state == REQUEST_LOCATION then
@@ -43,29 +39,11 @@ return {
       if not residence then return false end
       residence.type = Location.TYPE_RESIDENCE
       char.residence = residence.id
-      char:push_task('move', { dest = residence:get_position() })
       state.state = ENQUEUE_RESIDENCE
 
     elseif state.state == ENQUEUE_RESIDENCE then
       local residence = Location.get(char.residence)
-      local order = BuildOrder.create(residence.min, residence.max, function(x,y,z)
-        if x == residence.min.x or x == residence.max.x or
-           y == residence.max.y or
-           z == residence.min.z or z == residence.max.z
-        then
-          return "air"
-        elseif
-           x == residence.min.x+1 or x == residence.max.x-1 or
-           y == residence.max.y-1 or
-           z == residence.min.z+1 or z == residence.max.z-1
-        then
-          if x == residence.pos.x and z > residence.pos.z and y <= residence.min.y + 1 then
-            return "air"
-          end
-          return "default:stone"
-        end
-        return "air"
-      end)
+      local order = BuildOrder.create(residence.min, residence.max, 'house.lua')
 
       BuildOrder.register(order)
       char:push_task("build_lazily", { order = order.id })

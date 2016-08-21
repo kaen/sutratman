@@ -51,6 +51,7 @@ function Character:simulate(dt)
   if not ok then
     print('error performing task', err)
     stm.dump(self.tasks)
+    assert(false)
   end
   self:update_physics(dt)
 end

@@ -32,18 +32,13 @@ return {
 
     -- found a good spot
     local loc = Location.new({ type = Location.TYPE_MUNICIPALITY })
-    loc.pos = MapData.get_surface_pos(pos)
+    loc.pos = vector.new(pos.x, y_min, pos.z)
     loc.min = vector.new(pos.x - size, y_min, pos.z - size)
     loc.max = vector.new(pos.x + size, y_max, pos.z + size)
     Location.register(loc)
 
-    local build_fn = function(x,y,z)
-      if y >= loc.pos.y then return 'air' end
-      return 'default:dirt'
-    end
-
     -- create initial build orders for this location
-    local order = BuildOrder.create(loc.min, loc.max, build_fn)
+    local order = BuildOrder.create(loc.min, loc.max, 'flatland.lua')
     BuildOrder.register(order)
     loc:add_order(order)
 

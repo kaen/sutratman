@@ -14,24 +14,41 @@ end)
 local TASK_TIMEOUT = 3 * stm.TIME_SCALE
 
 --- Creates a build order from a schematic function.
--- @param min vector for the bounding rectangle's min point
--- @param max vector for the bounding rectangle's max point
--- @param fn callback function taking arguments `(x,y,z)` and returning a
---   string such as "default:dirt" or "air"
+-- @param bounding rectangle's min point
+-- @param rectangle's max point
+-- @param spec function, table, or string describing the nodes to be set
+-- during construction.
+-- If `spec` is a string it must be a filename relative to /schematics/.
+-- If the file ends in .lua, the file is evaluated with dofile and its result
+-- is expected to be one of the other supported spec types (a function or
+-- table).
+-- 
+-- If `spec` is a table it is assumed to have values of the following form,
+-- specifying positions and node names for the build order:
+--
+--     { pos = <vector>, name = <string> }
+--
+-- If `spec` is a function, it must take arguments of the form `(min, max)`, where:
+--
+--   - `min` is the minimum position of the build order in world coords
+--   - `max` is the maximum position of the build order in world coords
+--   - the function is expected to return a table as described above
 -- @return the newly created BuildOrder
-function BuildOrder.create(min, max, fn)
+function BuildOrder.create(min, max, spec)
   local result = BuildOrder.new()
+  if type(spec) == 'string' then
+    spec = dofile(stm.base_path .. "/schematics/" .. spec)
+  end
+
+  if type(spec) == 'function' then
+    spec = spec(min,max)
+  end
+
   result.min = min
   result.max = max
-  for x = min.x,max.x do
-    for y = min.y,max.y do
-      for z = min.z,max.z do
-        local name = fn(x,y,z)
-        if name then
-          result:push(vector.new(x,y,z), name)
-        end
-      end
-    end
+  -- TODO: truncate spec to given min/max extents?
+  for k,v in pairs(spec) do
+    result:push(v.pos, v.name)
   end
   return result
 end

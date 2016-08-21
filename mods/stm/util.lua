@@ -126,4 +126,30 @@ function stm.count_pairs(t)
   return result
 end
 
+--- Iterates over all integer positions between `a` and `b`, applying `fn`
+-- @param a min extents of the aabb
+-- @param b max extents of the aabb
+-- @param fn callback function taking arguments `(x,y,z)` and returning a string
+-- @return an array of tables where each element has the form `{ pos = <vector>, name = <result for that position> }`
+function stm.walk_aabb(a,b,fn)
+  local result = { }
+  for x = math.min(a.x,b.x),math.max(a.x,b.x),1 do
+    for y = math.min(a.y,b.y),math.max(a.y,b.y),1 do
+      for z = math.min(a.z,b.z),math.max(a.z,b.z),1 do
+        local name = fn(x,y,z)
+        if name then
+          table.insert(result, { pos = vector.new(x,y,z), name = name }) 
+        end
+      end
+    end
+  end
+  return result
+end
+
+if minetest then
+  stm.base_path = minetest.get_modpath('stm')
+else
+  stm.base_path = './mods/stm/'
+end
+
 math.randomseed(os.time())

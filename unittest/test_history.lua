@@ -13,8 +13,8 @@ function TestHistory:testSimulate()
   History.simulate(sim_time)
 
   local town = nil
-  for k,v in pairs(Location.all()) do
-    if v.type == Location.TYPE_MUNICIPALITY then
+  for k,v in pairs(Site.all()) do
+    if v.type == 'municipality_human' then
       town = v
       break
     end

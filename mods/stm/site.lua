@@ -1,6 +1,6 @@
-Location = serializable.define('Location', function()
+Site = serializable.define('Site', function()
   return {
-    name = "Location",
+    name = "Site",
     pos = { x = 0, y = 0, z = 0 },
     children = { },
     ruler = nil,
@@ -9,22 +9,22 @@ Location = serializable.define('Location', function()
   }
 end)
 
-Location.TYPE_MUNICIPALITY = 1
-Location.TYPE_RESIDENCE = 2
+Site.TYPE_MUNICIPALITY = 1
+Site.TYPE_RESIDENCE = 2
 
-function Location.get_closest(pos, filter)
-  for k,v in pairs(Location.all()) do
+function Site.get_closest(pos, filter)
+  for k,v in pairs(Site.all()) do
     -- TODO actual distance check
     if filter(v) then return v end
   end
   return nil
 end
 
-function Location:describe()
+function Site:describe()
   return string.format("%s, a simple %s", self.name, self.race)
 end
 
-function Location:get_position()
+function Site:get_position()
   return {
     x = self.pos.x,
     y = self.pos.y,
@@ -32,7 +32,7 @@ function Location:get_position()
   }
 end
 
-function Location:get_workers()
+function Site:get_workers()
   local result = { }
   for k,char in pairs(Character.all()) do
     -- all residents except the ruler are workers for now
@@ -44,27 +44,27 @@ function Location:get_workers()
   return result
 end
 
---- Returns true when built and ready for request_location
--- A location is complete when it has no incomplete build orders left
-function Location:is_complete()
+--- Returns true when built and ready for request_site
+-- A site is complete when it has no incomplete build orders left
+function Site:is_complete()
   return self:get_next_order() == nil
 end
 
---- Add an order to this Location's queue
-function Location:add_order(order)
+--- Add an order to this Site's queue
+function Site:add_order(order)
   table.insert(self.orders, order.id)
 end
 
 --- Get the next incomplete order to be worked on
 -- @return nil or a BuildOrder instance
-function Location:get_next_order()
+function Site:get_next_order()
   for _,id in pairs(self.orders) do
     local order = BuildOrder.get(id)
     if order and not order:is_complete() then return order end
   end
 end
 
-function Location:request_location(xsize, ysize, zsize)
+function Site:request_site(xsize, ysize, zsize)
   local min = vector.new(0,self.pos.y,0)
   local max = vector.new(0,self.pos.y + ysize - 1,0)
   local ok, other
@@ -77,7 +77,7 @@ function Location:request_location(xsize, ysize, zsize)
 
       ok = true
       for k, id in pairs(self.children) do
-        other = Location.get(id)
+        other = Site.get(id)
         if stm.rectangles_overlap(min,max,other.min,other.max) then
           ok = false
           break
@@ -85,8 +85,8 @@ function Location:request_location(xsize, ysize, zsize)
       end
 
       if ok then
-        local result = Location.new()
-        Location.register(result)
+        local result = Site.new()
+        Site.register(result)
         result.pos = vector.new(
           math.floor(min.x + (max.x - min.x)/2),
           math.floor(min.y),
@@ -100,3 +100,16 @@ function Location:request_location(xsize, ysize, zsize)
     end
   end
 end
+
+function Site:get_def()
+  return Site.defs[self.type]
+end
+
+-- defer to the site definition
+local old_index = Site.__index
+Site.__index = function(t,k)
+  if old_index[k] then return old_index[k] end
+  return t:get_def()[k]
+end
+
+Site.defs = stm.load_directory('sites')

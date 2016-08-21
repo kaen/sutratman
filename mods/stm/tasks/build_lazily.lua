@@ -25,7 +25,7 @@ return {
         state.surface_positions = MapData.get_all_surface_pos(xz_coords)
         state.surface_position_index = 1
       elseif not state.surface_positions[state.surface_position_index] then
-        -- we've tried all surface locations at this position, move to the
+        -- we've tried all surface sites at this position, move to the
         -- next adjacent position
         state.adjacent_position_index = state.adjacent_position_index + 1
         return

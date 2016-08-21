@@ -12,8 +12,8 @@ return {
       state.task = BuildOrder.get(state.order):take_job(char.pos)
       if not state.task then return end
 
-      state.surface_locations = nil
-      state.location_index = nil
+      state.surface_sites = nil
+      state.site_index = nil
       state.state = TRAVEL
 
     elseif state.state == TRAVEL then
@@ -25,27 +25,27 @@ return {
       end
 
       -- try pathing to any surface position at this x,z point
-      if not state.surface_locations then
-        state.surface_locations = { }
+      if not state.surface_sites then
+        state.surface_sites = { }
         for i=-1,1 do
           for j=-1,1 do
             if i ~= 0 or j ~= 0 then
               local tmp = vector.new(state.task.pos.x + i, state.task.pos.y, state.task.pos.z + j)
               for k,v in pairs(MapData.get_all_surface_pos(tmp)) do
-                table.insert(state.surface_locations, v)
+                table.insert(state.surface_sites, v)
               end
             end
           end
         end
-        state.location_index = 1
-      elseif state.location_index > #state.surface_locations then
-        -- we've tried all surface locations and could not get to any of them
+        state.site_index = 1
+      elseif state.site_index > #state.surface_sites then
+        -- we've tried all surface sites and could not get to any of them
         state.state = GET_TASK
         return
       end
 
       -- for now, workers can build infinitely up or down
-      char:push_task('move', { dest = state.surface_locations[state.location_index], distance = 2 })
+      char:push_task('move', { dest = state.surface_sites[state.site_index], distance = 2 })
       state.state = WORK
 
     elseif state.state == WORK then
@@ -54,9 +54,9 @@ return {
         table.insert(stm.data.set_node_queue, {pos = state.task.pos, node = { name = state.task.name }})
         state.state = GET_TASK
       else
-        -- if we couldn't path there, try the next surface location
+        -- if we couldn't path there, try the next surface site
         state.state = TRAVEL
-        state.location_index = state.location_index + 1
+        state.site_index = state.site_index + 1
       end
     end
   end

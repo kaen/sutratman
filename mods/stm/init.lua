@@ -9,7 +9,7 @@ local SOURCES = {
   'character.lua',
   'build_order.lua',
   'task.lua',
-  'location.lua',
+  'site.lua',
   'deities.lua',
   'history.lua',
   'misc_helpers.lua'

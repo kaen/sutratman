@@ -11,23 +11,23 @@ return {
   perform = function(char, state)
     if state.state == BEGIN then
       -- find the closest municipality
-      local loc = Location.get_closest(char:get_position(), function(x)
-        return x.type == Location.TYPE_MUNICIPALITY
+      local site = Site.get_closest(char:get_position(), function(x)
+        return x.is_municipality
       end)
 
-      if not loc then
+      if not site then
         -- there's no where to go, better start our own
         char:push_task('establish_municipality')
         state.state = BEGIN
         return
       end
 
-      char.municipality = loc.id
+      char.municipality = site.id
       state.state = REQUEST_LOCATION
 
     elseif state.state == REQUEST_LOCATION then
       -- help build the municipality if it is not complete yet
-      local municipality = Location.get(char.municipality)
+      local municipality = Site.get(char.municipality)
       if not municipality:is_complete() then
         local order = municipality:get_next_order()
         if order then char:push_task('build_lazily', { order = order.id }) end
@@ -35,14 +35,14 @@ return {
       end
 
       -- when complete, ask for a place to build a home
-      local residence = municipality:request_location(7,5,7)
+      local residence = municipality:request_site(7,5,7)
       if not residence then return false end
-      residence.type = Location.TYPE_RESIDENCE
+      residence.type = Site.TYPE_RESIDENCE
       char.residence = residence.id
       state.state = ENQUEUE_RESIDENCE
 
     elseif state.state == ENQUEUE_RESIDENCE then
-      local residence = Location.get(char.residence)
+      local residence = Site.get(char.residence)
       local order = BuildOrder.create(residence.min, residence.max, 'house.lua')
 
       BuildOrder.register(order)

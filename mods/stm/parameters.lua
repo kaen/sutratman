@@ -3,7 +3,9 @@
 -- are accessed.
 Parameters = { }
 
--- Number of deities to create
+--- Half size of the astral plane
+Parameters.astral_plane_half_size = 10
+--- Number of deities to create
 Parameters.deity_count = 1
 --- Half size of new municipalities (in number of nodes)
 Parameters.municipality_half_size = 15

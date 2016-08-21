@@ -13,13 +13,13 @@ function TestSimulation:testSimulate()
   Simulation.simulate(sim_time)
 
   local town = nil
+  local plane = nil
   for k,v in pairs(Site.all()) do
-    if v.type == 'municipality_human' then
-      town = v
-      break
-    end
+    if v.type == 'municipality_human' then town = v end
+    if v.type == 'astral_plane' then plane = v end
   end
 
+  assert(plane)
   local town_pos = town:get_position()
 
   -- there should be at least 5 characters in the world, and all should be

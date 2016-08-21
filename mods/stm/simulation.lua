@@ -2,6 +2,7 @@
 Simulation = { }
 function Simulation:populate()
   if not stm.data.simulation then
+    Simulation.create_astral_plane()
     Race.populate()
     Deity:populate()
 
@@ -17,6 +18,24 @@ function Simulation.materialize()
   for _, c in pairs(Character.all()) do
     c:materialize()
   end
+end
+
+function Simulation.create_astral_plane()
+  local min_extent, max_extent = MapData.get_extents() 
+  local min = vector.new(
+    -Parameters.astral_plane_half_size,
+    max_extent.y + 10,
+    -Parameters.astral_plane_half_size
+  )
+  local max = vector.new(
+    Parameters.astral_plane_half_size,
+    max_extent.y + 10 + Parameters.astral_plane_half_size,
+    Parameters.astral_plane_half_size
+  )
+  local site = Site.new({ type = 'astral_plane', min = min, max = max })
+  Site.register(site)
+  site:create_initial_build_orders()
+  BuildOrder.get(site.orders[1]):complete_immediately()
 end
 
 --- simulates n game seconds of simulation from the current state

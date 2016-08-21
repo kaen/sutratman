@@ -7,8 +7,8 @@ local function serialize(data)
   return minetest.serialize(data)
 end
 
-local function unserialize(data)
-  return minetest.unserialize(data)
+local function deserialize(data)
+  return minetest.deserialize(data)
 end
 
 local function get_uuid()
@@ -52,21 +52,21 @@ function serializable.define(name, initializer)
   --- Registers an instance of the class in a registry for later serialization.
   -- @param o instance of this klass to register
   klass.register = function(o)
-    instances[klass] = instances[klass] or { }
-    instances[klass][o.id] = o
+    instances[name] = instances[name] or { }
+    instances[name][o.id] = o
   end
 
   --- Gets a registered instance of a klass by ID
   -- @param id Number the id number of the object to retrieve
   klass.get = function(id)
-    if not instances[klass] then return end
-    return instances[klass][id]
+    if not instances[name] then return end
+    return instances[name][id]
   end
 
   --- Gets a reference to the table of instances of this class.
   -- @return Table a hash of `id` numbers to the actual object instance
   klass.all = function()
-    return instances[klass] or { }
+    return instances[name] or { }
   end
 
   return klass
@@ -83,11 +83,12 @@ end
 -- Inflates a string created by `deflate` into a registry full of objects
 -- created from the appropriate klass (and retrievable with `klass.get`)
 function serializable.inflate(str)
-  local data = unserialize(str)
-  for klass,objects in pairs(data) do
-    instances[klass] = instances[klass] or { }
-    for _,object in pairs(objects) do
-      instances[klass][object.id] = klasses[klass].new(object)
+  local data = deserialize(str)
+  for name,objects in pairs(data) do
+    instances[name] = instances[name] or { }
+    for k,object in pairs(objects) do
+      print(k,object)
+      instances[name][object.id] = klasses[name].new(object)
     end
   end
 end

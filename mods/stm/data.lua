@@ -1,18 +1,31 @@
 --- Manages the loading/saving of data for the simulation
+
 local function loaddata()
+  local objects_file = minetest.get_worldpath() .. "/objects"
   local data_file = minetest.get_worldpath() .. "/data"
+  local file = io.open(objects_file, "r")
+  if not file then return {} end
+  serializable.inflate(file:read("*a"))
+  io.close(file)
+
   local file = io.open(data_file, "r")
   if not file then return {} end
-  local result = serializable.inflate(file:read("*a"))
+  stm.data = minetest.deserialize(file:read("*a"))
   io.close(file)
-  return result
 end
 
 local function savedata()
+  local objects_file = minetest.get_worldpath() .. "/objects"
   local data_file = minetest.get_worldpath() .. "/data"
-  local file = io.open(data_file, "w")
+  local file = io.open(objects_file, "w")
   if file then
     file:write(serializable.deflate())
+    io.close(file)
+  end
+
+  file = io.open(data_file, "w")
+  if file then
+    file:write(minetest.serialize(stm.data))
     io.close(file)
   end
 end

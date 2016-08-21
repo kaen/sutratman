@@ -61,4 +61,10 @@ if minetest then
     print("materialized")
     minetest.register_globalstep(function(dt) History.simulate(History.real_to_game(dt)) end)
   end)
+  minetest.after(1, function()
+    if stm.data.mapdata_generation_callbacks_fired then
+      print('resuming')
+      minetest.register_globalstep(function(dt) History.simulate(History.real_to_game(dt)) end)
+    end
+  end)
 end

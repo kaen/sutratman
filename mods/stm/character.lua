@@ -44,15 +44,7 @@ end
 --- Perform all simulation for this character.
 -- @param dt time in game seconds to simulate
 function Character:simulate(dt)
-  local ok, err = pcall(function()
-    self:perform_tasks(dt)
-  end)
-
-  if not ok then
-    print('error performing task', err)
-    stm.dump(self.tasks)
-    assert(false)
-  end
+  self:perform_tasks(dt)
   self:update_physics(dt)
 end
 
@@ -153,7 +145,7 @@ end
 
 --- Get the current task for this character.
 function Character:get_current_task()
-  local task = self.tasks[#self.tasks]
+  local task = Task.get(self.tasks[#self.tasks])
   if not task then return nil end
   return task, Task.defs[task.name]
 end
@@ -179,13 +171,14 @@ end
 -- @usage char:push_task('move', { dest = a_far_away_place, distance = 3 })
 function Character:push_task(name, state)
   state = state or { }
-  table.insert(self.tasks, Task.new({name = name, state = state}))
+  local task = Task.new({name = name, state = state})
+  Task.register(task)
+  table.insert(self.tasks, task.id)
 end
 
 function Character:pop_task(task)
-  local i, t
-  for i,t in ipairs(self.tasks) do
-    if t == task then
+  for i,id in ipairs(self.tasks) do
+    if id == task.id then
       table.remove(self.tasks, i)
       break
     end
@@ -263,6 +256,10 @@ if _G.minetest then
     end,
     on_rightclick = function(self, clicker)
       stm.dump(self:get_char())
+      for k,v in pairs(self:get_char().tasks) do
+        print(v)
+        stm.dump(Task.get(v))
+      end
     end,
     get_char = function(self)
       if not self.char_id then return nil end

@@ -2,12 +2,11 @@ stm.MAP_BLOCK_SIZE = 80
 stm.XSIZE = stm.MAP_BLOCK_SIZE * 1
 stm.YSIZE = stm.MAP_BLOCK_SIZE * 1
 stm.ZSIZE = stm.MAP_BLOCK_SIZE * 1
-stm.data.map = {
-  block_offset = nil,
-  expected_blocks = stm.XSIZE * stm.YSIZE * stm.ZSIZE * 8 / math.pow(stm.MAP_BLOCK_SIZE, 3),
-  generated_blocks = 0,
-  generation_callbacks_fired = false
-}
+
+stm.data.mapdata_block_offset = nil
+stm.data.mapdata_expected_blocks = stm.XSIZE * stm.YSIZE * stm.ZSIZE * 8 / math.pow(stm.MAP_BLOCK_SIZE, 3)
+stm.data.mapdata_generated_blocks = 0
+stm.data.mapdata_generation_callbacks_fired = false
 
 MapData = { }
 MapData.generation_callbacks = { }
@@ -164,7 +163,7 @@ function MapData.get_surface_variance(min, max)
 end
 
 function MapData.get_extents()
-  local offset = stm.data.map.block_offset
+  local offset = stm.data.mapdata_block_offset
   local min = {
     x = -stm.XSIZE + offset.x,
     y = -stm.YSIZE + offset.y,
@@ -181,8 +180,8 @@ function MapData.get_extents()
 end
 
 function MapData.on_generated(minp, maxp, blockseed)
-  if type(stm.data.map.block_offset) ~= 'table' then
-    stm.data.map.block_offset = {
+  if type(stm.data.mapdata_block_offset) ~= 'table' then
+    stm.data.mapdata_block_offset = {
       x = minp.x % 80,
       y = minp.y % 80,
       z = minp.z % 80
@@ -197,11 +196,11 @@ function MapData.on_generated(minp, maxp, blockseed)
      minp.z >= min_extent.z and
      maxp.z <= max_extent.z
   then
-    stm.data.map.generated_blocks = 1 + stm.data.map.generated_blocks
+    stm.data.mapdata_generated_blocks = 1 + stm.data.mapdata_generated_blocks
   end
 
-  if stm.data.map.generated_blocks == stm.data.map.expected_blocks and not stm.data.map.generation_callbacks_fired then
-    stm.data.map.generation_callbacks_fired = true
+  if stm.data.mapdata_generated_blocks == stm.data.mapdata_expected_blocks and not stm.data.mapdata_generation_callbacks_fired then
+    stm.data.mapdata_generation_callbacks_fired = true
     for _, callback in ipairs(MapData.generation_callbacks) do
       callback()
     end

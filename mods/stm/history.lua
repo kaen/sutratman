@@ -2,6 +2,7 @@
 History = { }
 function History:populate()
   if not stm.data.history then
+    Race.populate()
     Deity:populate()
 
     for k,deity in pairs(Deity.all()) do

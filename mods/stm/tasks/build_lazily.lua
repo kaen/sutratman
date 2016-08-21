@@ -43,12 +43,12 @@ return {
       end
 
     elseif state.state == GET_TASK then
-      state.task = BuildOrder.get(state.order):take_task(char.pos)
+      state.task = BuildOrder.get(state.order):take_job(char.pos)
       if not state.task then return end
       -- if the job is already done, move to the next one
       if MapData.get_node(state.task.pos).name == state.task.name then
         state.state = GET_TASK
-        BuildOrder.get(state.order):complete_task(state.task.id)
+        BuildOrder.get(state.order):complete_job(state.task.id)
         return
       end
       -- for now, workers can build infinitely up or down

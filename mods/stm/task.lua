@@ -21,4 +21,4 @@ function Task.loadDefs()
   end
 end
 
-Task.loadDefs()
+Task.defs = stm.load_directory('tasks')

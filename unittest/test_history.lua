@@ -26,6 +26,7 @@ function TestHistory:testSimulate()
   -- residents of this town
   assert(stm.count_pairs(Character.all()) > 5)
   for k,v in pairs(Character.all()) do
+    assertEquals(Race.get(v.race).name, 'human')
     assertEquals(v.municipality, town.id)
     if town.ruler ~= v.id then assert(v.residence) end
   end

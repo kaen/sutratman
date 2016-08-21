@@ -4,7 +4,7 @@ Character = serializable.define('Character', function()
     pos = vector.new(0,0,0),
     yaw = 0,
     name = "",
-    race = "human",
+    race = nil,
     velocity = vector.new(0,0,0),
     acceleration = vector.new(0,0,0),
     municipality = nil,
@@ -13,18 +13,6 @@ Character = serializable.define('Character', function()
     tasks = { }
   }
 end)
-
---- Put an initial batch of characters into the world.
-function Character.populate()
-  local creator_deity = stm.pick_one_from_hash(Deity.all())
-  local eden = creator_deity:pick_eden()
-  local count = 10 + math.random(10)
-  for i=1,count do
-    local char = Character.new()
-    Character.register(char)
-    char.pos = MapData.random_point_near(eden, 10)
-  end
-end
 
 --- Get a copy of this character's position.
 -- @return vector

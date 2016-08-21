@@ -37,13 +37,23 @@ end
 function Deity:create_mortals()
   local count = Parameters.minimum_eden_mortals + math.random(Parameters.extra_eden_mortals)
   local eden = self:pick_eden()
-  local char
+  local race = self:pick_race()
+  race.creator = self.id
+
   for i=1,count do
-    char = Character.new()
+    local char = Character.new({ race = race.id })
     char.pos = MapData.get_surface_pos(MapData.random_point_near(eden, 10))
     char:push_task('wander')
     char:push_task('find_residence')
     Character.register(char)
+  end
+end
+
+--- Find a compatible Race that does not yet have a creator
+-- @return a Race instance or nil
+function Deity:pick_race()
+  for k,v in pairs(Race.all()) do
+    if v.creator == nil then return v end
   end
 end
 

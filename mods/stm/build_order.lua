@@ -62,7 +62,7 @@ function BuildOrder:push(pos, name)
 end
 
 --- Takes the unclaimed task closest to pos
-function BuildOrder:take_task(pos)
+function BuildOrder:take_job(pos)
   local free_tasks = { }
   local best_dist = math.huge
   local best_task = nil
@@ -83,7 +83,7 @@ function BuildOrder:take_task(pos)
 end
 
 --- Mark a given task as complete
-function BuildOrder:complete_task(id)
+function BuildOrder:complete_job(id)
   self.remaining = self.remaining - 1
   self.spec[id] = nil
 end

@@ -5,6 +5,7 @@ local SOURCES = {
   'data.lua',
   'util.lua',
   'mapdata.lua',
+  'race.lua',
   'character.lua',
   'build_order.lua',
   'task.lua',

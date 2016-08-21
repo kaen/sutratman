@@ -146,6 +146,22 @@ function stm.walk_aabb(a,b,fn)
   return result
 end
 
+function stm.load_directory(dir)
+  local path = 'mods/stm/'
+  if _G.minetest then
+    path = minetest.get_modpath("stm")
+  end
+  path = path .. dir .. '/'
+  local list = io.popen('ls -1 ' .. path)
+  local basename
+  local result = { }
+  for name in function() return list:read() end do
+    basename = string.gsub(name, '.lua', '')
+    result[basename] = dofile(path .. name)
+  end
+  return result
+end
+
 if minetest then
   stm.base_path = minetest.get_modpath('stm')
 else

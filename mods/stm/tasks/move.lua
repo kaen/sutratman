@@ -56,7 +56,7 @@ return {
         state.blocked_frames = state.blocked_frames + 1
         if state.blocked_frames > MAX_BLOCKED_FRAMES then
           state.state = PATH
-          print('blocked movement detected')
+          -- print('blocked movement detected')
         end
       end
 

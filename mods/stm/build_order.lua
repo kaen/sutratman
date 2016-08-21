@@ -13,42 +13,47 @@ end)
 -- wait N standard realtime seconds before a task can be reclaimed
 local TASK_TIMEOUT = 3 * stm.TIME_SCALE
 
---- Creates a build order from a schematic function.
--- @param bounding rectangle's min point
--- @param rectangle's max point
--- @param spec function, table, or string describing the nodes to be set
--- during construction.
--- If `spec` is a string it must be a filename relative to /schematics/.
--- If the file ends in .lua, the file is evaluated with dofile and its result
--- is expected to be one of the other supported spec types (a function or
--- table).
--- 
--- If `spec` is a table it is assumed to have values of the following form,
--- specifying positions and node names for the build order:
---
---     { pos = <vector>, name = <string> }
---
--- If `spec` is a function, it must take arguments of the form `(min, max)`, where:
---
---   - `min` is the minimum position of the build order in world coords
---   - `max` is the maximum position of the build order in world coords
---   - the function is expected to return a table as described above
--- @return the newly created BuildOrder
-function BuildOrder.create(min, max, spec)
-  local result = BuildOrder.new()
-  if type(spec) == 'string' then
-    spec = dofile(stm.base_path .. "/schematics/" .. spec)
+function BuildOrder.from_schematic(base, name)
+  local spec = dofile(stm.base_path .. "/schematics/" .. name .. ".lua")
+  local translated_nodes = { }
+  for i,n in pairs(spec.nodes) do
+    local pos = stm.int_to_pos(i)
+    pos = vector.add(pos, base)
+    translated_nodes[stm.pos_to_int(pos)] = n
   end
+  return BuildOrder.create(translated_nodes)
+end
+
+function BuildOrder.from_generator(min, max, name)
+  local spec = dofile(stm.base_path .. "/generators/" .. name .. ".lua")
+  return BuildOrder.create(spec(min,max))
+end
+
+--- Creates a build order from a schematic function.
+-- @param spec mapping of integers to node objects (used with set_node).
+-- The keys are passed to stm.int_to_pos, and the result is expected to be the absolute position to pass to set_node
+-- The values are passed as-is to set_node
+function BuildOrder.create(spec)
+  local result = BuildOrder.new()
 
   if type(spec) == 'function' then
     spec = spec(min,max)
   end
 
-  result.min = min
-  result.max = max
+  result.min = vector.new(math.huge, math.huge, math.huge)
+  result.max = vector.new(-math.huge, -math.huge, -math.huge)
   -- TODO: truncate spec to given min/max extents?
   for k,v in pairs(spec) do
-    result:push(v.pos, v.name)
+    local pos = stm.int_to_pos(k)
+    result.min.x = math.min(result.min.x, pos.x)
+    result.min.y = math.min(result.min.y, pos.y)
+    result.min.z = math.min(result.min.z, pos.z)
+    result.max.x = math.max(result.max.x, pos.x)
+    result.max.y = math.max(result.max.y, pos.y)
+    result.max.z = math.max(result.max.z, pos.z)
+    stm.dump(pos)
+    print(name)
+    result:push(pos, v.name)
   end
   return result
 end

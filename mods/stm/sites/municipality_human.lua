@@ -15,7 +15,7 @@ local function find_suitable_location(self, hint)
 end
 
 local function create_initial_build_orders(self)
-  local order = BuildOrder.create(self.min, self.max, 'flatland.lua')
+  local order = BuildOrder.from_generator(self.min, self.max, 'flatland')
   BuildOrder.register(order)
   self:add_order(order)
 end

@@ -32,7 +32,7 @@ end
 
 if minetest then
   minetest.register_on_shutdown(savedata)
-  minetest.after(0, loaddata)
+  -- minetest.after(0, loaddata)
 end
 
 -- time in in-game seconds since the simulation started

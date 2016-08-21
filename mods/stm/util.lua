@@ -138,7 +138,8 @@ function stm.walk_aabb(a,b,fn)
       for z = math.min(a.z,b.z),math.max(a.z,b.z),1 do
         local name = fn(x,y,z)
         if name then
-          table.insert(result, { pos = vector.new(x,y,z), name = name }) 
+          local pos = vector.new(x,y,z)
+          result[stm.pos_to_int(pos)] = { name = name }
         end
       end
     end
@@ -160,6 +161,54 @@ function stm.load_directory(dir)
     result[basename] = dofile(path .. name)
   end
   return result
+end
+
+function stm.get_blueprint_data(a, b, name)
+  local min = vector.new(math.min(a.x, b.x), math.min(a.y,b.y), math.min(a.z,b.z))
+  local max = vector.new(math.max(a.x, b.x), math.max(a.y,b.y), math.max(a.z,b.z))
+  local base = vector.new(
+    math.floor(min.x + (max.x - min.x) / 2),
+    math.floor(min.y + (max.y - min.y) / 2),
+    math.floor(min.z + (max.z - min.z) / 2)
+  )
+  local data = {
+    base = base,
+    size = vector.subtract(max, min),
+    nodes = { }
+  }
+  for x=min.x,max.x do
+    for y=min.y,max.y do
+      for z=min.z,max.z do
+        local pos = vector.new(x,y,z)
+        local node = minetest.get_node(pos)
+        table.insert(data.nodes, { pos = vector.subtract(pos, base), node = node })
+      end
+    end
+  end
+  return data
+end
+
+local min_value = -math.floor(0xFFFF/2)
+local bit_spacing = 0x10000
+function stm.pos_to_int(pos)
+  return (pos.z - min_value) * bit_spacing * bit_spacing +
+    (pos.y - min_value) * bit_spacing +
+    (pos.x - min_value)
+end
+
+function stm.int_to_pos(i)
+  local pos = vector.new(0,0,0)
+  local raw = nil
+  raw = math.floor(i / (bit_spacing * bit_spacing))
+  i = i - raw * bit_spacing * bit_spacing
+  pos.z = raw + min_value
+
+  raw = math.floor(i / bit_spacing)
+  i = i - raw * bit_spacing
+  pos.y = raw + min_value
+
+  pos.x = i + min_value
+  return pos;
 end
 
 if minetest then

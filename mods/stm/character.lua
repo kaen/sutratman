@@ -8,7 +8,9 @@ Character = serializable.define('Character', function()
     velocity = vector.new(0,0,0),
     acceleration = vector.new(0,0,0),
     municipality = nil,
+    materialized = false,
     residence = nil,
+    dead = false,
     on_ground = false,
     soul = nil,
     tasks = { }
@@ -31,6 +33,15 @@ end
 
 function Character:get_race()
   return Race.get(self.race)
+end
+
+function Character:is_dead()
+  return self.dead
+end
+
+--- Mark a character as dead and send on-death messages
+function Character:die()
+  self.dead = true
 end
 
 --- Get a string describing this character
@@ -192,8 +203,13 @@ end
 
 --- Create the minetest entity that represents this character.
 function Character:materialize()
+  self.materialized = true
   local entity = minetest.add_entity(self.pos, 'stm:character')
   entity:get_luaentity().char_id = self.id
+end
+
+function Character:is_materialized()
+  return self.materialized
 end
 
 --- Move to position.

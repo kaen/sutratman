@@ -14,7 +14,26 @@ function TestSoul:testReincarnation()
 
   -- assert that we create a character when incarnated
   local char = subject:incarnate()
+  assert(subject:get_char() == char)
   assert(char:get_soul() == subject)
   assert(char:get_race().name == 'human')
+  assert(char:is_materialized())
   assert(site:contains(char:get_position()))
+
+  subject:excarnate()
+  assert(char:is_dead())
+  assert(not char:is_materialized())
+  assert(not subject:get_char())
+end
+
+function TestSoul:testFindOrCreate()
+  local player = { get_player_name = function() return 'testplayer' end }
+
+  -- expect it to create a new Soul
+  local subject = Soul.find_or_create(player)
+
+  -- call it again and expect to get the same one
+  local subject2 = Soul.find_or_create(player)
+  assert(subject2 == subject)
+  assert(subject.name == 'testplayer')
 end

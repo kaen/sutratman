@@ -117,4 +117,10 @@ Site.__index = function(t,k)
   return t:get_def()[k]
 end
 
+function Site:contains(pos)
+  return self.min.x <= pos.x and self.max.x >= pos.x and
+         self.min.y <= pos.y and self.max.y >= pos.y and
+         self.min.z <= pos.z and self.max.z >= pos.z 
+end
+
 Site.defs = stm.load_directory('sites')

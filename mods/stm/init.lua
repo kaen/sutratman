@@ -7,6 +7,7 @@ local SOURCES = {
   'mapdata.lua',
   'race.lua',
   'character.lua',
+  'soul.lua',
   'build_order.lua',
   'task.lua',
   'site.lua',

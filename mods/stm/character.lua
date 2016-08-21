@@ -10,6 +10,7 @@ Character = serializable.define('Character', function()
     municipality = nil,
     residence = nil,
     on_ground = false,
+    soul = nil,
     tasks = { }
   }
 end)
@@ -22,6 +23,14 @@ function Character:get_position()
     y = self.pos.y,
     z = self.pos.z
   }
+end
+
+function Character:get_soul()
+  return Soul.get(self.soul)
+end
+
+function Character:get_race()
+  return Race.get(self.race)
 end
 
 --- Get a string describing this character

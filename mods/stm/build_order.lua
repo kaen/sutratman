@@ -6,11 +6,11 @@ BuildOrder = serializable.define('BuildOrder', function()
     remaining = 0,
     min = nil,
     max = nil,
-    spec = {}
+    jobs = {}
   }
 end)
 
--- wait N standard realtime seconds before a task can be reclaimed
+-- wait N standard realtime seconds before a job can be reclaimed
 local TASK_TIMEOUT = 3 * stm.TIME_SCALE
 
 function BuildOrder.from_schematic(base, name)
@@ -51,46 +51,44 @@ function BuildOrder.create(spec)
     result.max.x = math.max(result.max.x, pos.x)
     result.max.y = math.max(result.max.y, pos.y)
     result.max.z = math.max(result.max.z, pos.z)
-    stm.dump(pos)
-    print(name)
-    result:push(pos, v.name)
+    result:push_job(pos, v)
   end
   return result
 end
 
---- Add a block with the given `name` at `pos`
-function BuildOrder:push(pos, name)
+--- Add job to build `node` at `pos`
+function BuildOrder:push_job(pos, node)
   self.total = self.total + 1
   self.remaining = self.remaining + 1
   local id = stm.get_uuid()
-  self.spec[id] = { pos = pos, name = name, id = id }
+  self.jobs[id] = { pos = pos, node = node, id = id }
 end
 
---- Takes the unclaimed task closest to pos
+--- Takes the unclaimed job closest to pos
 function BuildOrder:take_job(pos)
-  local free_tasks = { }
+  local free_jobs = { }
   local best_dist = math.huge
-  local best_task = nil
-  for k,task in pairs(self.spec) do
-    if not task.taken or stm.data.time - task.taken > TASK_TIMEOUT then
-      local dist = vector.subtract(pos, task.pos)
-      local dist_squared = dist.x * dist.x + dist.z * dist.z
+  local best_job = nil
+  for k,job in pairs(self.jobs) do
+    if not job.taken or stm.data.time - job.taken > TASK_TIMEOUT then
+      local delta = vector.subtract(pos, job.pos)
+      local dist_squared = delta.x * delta.x + delta.z * delta.z
       if dist_squared < best_dist then
         best_dist = dist_squared
-        best_task = task
+        best_job = job
       end
     end
   end
 
-  if not best_task then return end
-  best_task.taken = stm.data.time
-  return best_task
+  if not best_job then return end
+  best_job.taken = stm.data.time
+  return best_job
 end
 
---- Mark a given task as complete
+--- Mark a given job as complete
 function BuildOrder:complete_job(id)
   self.remaining = self.remaining - 1
-  self.spec[id] = nil
+  self.jobs[id] = nil
 end
 
 --- Returns true if the entire build order is complete

@@ -38,7 +38,6 @@ function TestHistory:testSimulate()
   assert(#town.children > 5)
   local min = vector.new(town_pos.x - 5, town_pos.y, town_pos.z - 5)
   local max = vector.new(town_pos.x + 5, town_pos.y, town_pos.z + 5)
-  local variance, y_min, y_max = MapData.get_surface_variance(min, max)
 
   -- All build orders should be complete
   for k,v in pairs(BuildOrder.all()) do

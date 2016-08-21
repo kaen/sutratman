@@ -1,5 +1,3 @@
-local MINIMUM_SPACING = 100
-
 local function find_suitable_location(char, state, size)
   local max_variance = size / 2
   local start = MapData.get_surface_pos(MapData.random_point_near(char:get_position(), 10))
@@ -17,13 +15,13 @@ return {
     -- do nothing, planning is retried in perform
   end,
   perform = function(char, state)
-    local size = 15
+    local size = Parameters.municipality_half_size
     local closest = Location.get_closest(char:get_position(), function(x)
         return x.type == Location.TYPE_MUNICIPALITY
     end)
 
     -- we're too close to another town, so we'll always fail to find a good spot
-    if closest and vector.distance(closest:get_position(), char:get_position()) < MINIMUM_SPACING then
+    if closest and vector.distance(closest:get_position(), char:get_position()) < Parameters.minimum_municipality_distance then
       return false
     end
 

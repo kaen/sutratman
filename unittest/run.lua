@@ -47,6 +47,7 @@ for k,v in pairs(_G) do
                         dofile("unittest/mocks/" .. name)
                     end
                 end
+                math.randomseed(1337)
                if oldFunction then oldFunction() end
             end
         end)()

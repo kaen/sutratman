@@ -151,5 +151,3 @@ if minetest then
 else
   stm.base_path = './mods/stm/'
 end
-
-math.randomseed(os.time())

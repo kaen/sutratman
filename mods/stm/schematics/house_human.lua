@@ -15,7 +15,7 @@ return function(min,max)
       if x == midx and z > midz and y <= min.y + 1 then
         return "air"
       end
-      return "default:stone"
+      return "default:wood"
     end
     return "air"
   end

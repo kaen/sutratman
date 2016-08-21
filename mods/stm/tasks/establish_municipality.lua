@@ -4,7 +4,6 @@ return {
     -- do nothing, planning is retried in perform
   end,
   perform = function(char, state)
-    local size = Parameters.municipality_half_size
     local closest = Site.get_closest(char:get_position(), function(x)
         return x.is_municipality == true
     end)

@@ -149,7 +149,7 @@ end
 function stm.load_directory(dir)
   local path = 'mods/stm/'
   if _G.minetest then
-    path = minetest.get_modpath("stm")
+    path = minetest.get_modpath("stm") .. "/"
   end
   path = path .. dir .. '/'
   local list = io.popen('ls -1 ' .. path)

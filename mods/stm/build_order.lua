@@ -96,6 +96,14 @@ function BuildOrder:is_complete()
   return self.remaining == 0
 end
 
+--- Immediately performs all jobs in the build order
+function BuildOrder:complete_immediately()
+  for id,job in pairs(self.jobs) do
+    MapData.set_node(job.pos, job.node)
+    self:complete_job(id)
+  end
+end
+
 --- Find all positions adjacent to this build order.
 -- The returned positions can be passed to map_data.get_all_surface_pos for
 -- pathing to the build site. Only the x/z components are valid in the

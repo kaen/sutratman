@@ -36,7 +36,7 @@ function TestCharacter:testCollision()
   c.pos = vector.new(0,1,0)
   local wall_pos = vector.new(0,1,5)
   local dest_pos = vector.new(0,1,10)
-  local step = History.real_to_game(1/60) 
+  local step = Simulation.real_to_game(1/60) 
 
   -- make an impassable wall between us and the destination
   for i=-1,1 do
@@ -54,7 +54,7 @@ function TestCharacter:testCollision()
 end
 
 function TestCharacter:testPathing()
-  local step = History.real_to_game(1/60) 
+  local step = Simulation.real_to_game(1/60) 
   local c = Character.new()
   local i, j
   c.pos = vector.new(0,1,0)
@@ -75,7 +75,7 @@ function TestCharacter:testJumping()
   c.pos = vector.new(0,1,0)
   local wall_pos = vector.new(0,1,5)
   local dest_pos = vector.new(0,1,10)
-  local step = History.real_to_game(1/60) 
+  local step = Simulation.real_to_game(1/60) 
 
   -- make a low wall between us and the destination
   for i=-1,1 do
@@ -95,7 +95,7 @@ function TestCharacter:testGravity()
   local c = Character.new()
   local i, j
   c.pos = vector.new(0,10,0)
-  local step = History.real_to_game(1/60) 
+  local step = Simulation.real_to_game(1/60) 
 
   for t=0,10000,step do
     c:simulate(step)

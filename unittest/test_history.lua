@@ -1,16 +1,16 @@
-TestHistory = {}
-function TestHistory:testPopulate()
-  History:populate()
+TestSimulation = {}
+function TestSimulation:testPopulate()
+  Simulation:populate()
   assert(stm.count_pairs(Character.all()) > 5)
 end
 
-function TestHistory:testSimulate()
+function TestSimulation:testSimulate()
   local sim_time = 0.1 *24*60*60
   -- TODO: uncomment this line when physics stop being screwy
   -- MapData.get_node = MapData.get_node_mock_wavy
 
-  History.populate()
-  History.simulate(sim_time)
+  Simulation.populate()
+  Simulation.simulate(sim_time)
 
   local town = nil
   for k,v in pairs(Site.all()) do

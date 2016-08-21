@@ -12,7 +12,7 @@ local SOURCES = {
   'task.lua',
   'site.lua',
   'deities.lua',
-  'history.lua',
+  'simulation.lua',
   'misc_helpers.lua'
 }
 

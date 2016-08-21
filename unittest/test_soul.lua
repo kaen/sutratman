@@ -3,7 +3,7 @@ function TestSoul:testReincarnation()
   local subject = Soul.new()
   Soul.register(subject)
 
-  History.populate()
+  Simulation.populate()
 
   -- create a home for the characters
   local site = Site.new({type = 'municipality_human'})

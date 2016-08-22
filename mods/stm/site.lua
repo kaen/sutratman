@@ -62,6 +62,15 @@ function Site:get_next_order()
     local order = BuildOrder.get(id)
     if order and not order:is_complete() then return order end
   end
+
+  -- nothing found, check our children
+  for k,id in pairs(self.children) do
+    local child = Site.get(id)
+    if child then
+      local order = child:get_next_order()
+      if order then return order end
+    end
+  end
 end
 
 --- Request space in this site for the given child site
@@ -72,37 +81,52 @@ end
 -- @param size a vector specifying the space needed
 -- @return true when space was found
 function Site:request_space(child, size)
+  for x = self.min.x,(self.max.x-size.x) do
+    for z = self.min.z,(self.max.z-size.z) do
+      if self:allocate_space(child, size, x, z) then return true end
+    end
+  end
+end
+
+--- Like `request_space`, but positions are chosen randomly rather than scanned.
+function Site:request_space_randomly(child, size)
+  local attempts = 0
+  while attempts < Parameters.site_request_space_randomly_max_attempts do
+    local x = math.random(self.min.x,(self.max.x-size.x))
+    local z = math.random(self.min.z,(self.max.z-size.z))
+    if self:allocate_space(child, size, x, z) then return true end
+    attempts = attempts + 1
+  end
+end
+
+function Site:allocate_space(child, size, x, z)
+  local ok, other
   local min = vector.new(0,self.pos.y,0)
   local max = vector.new(0,self.pos.y + size.y - 1,0)
-  local ok, other
-  for x = self.min.x,(self.max.x-size.x+1) do
-    for z = self.min.z,(self.max.z-size.z+1) do
-      min.x = x
-      min.z = z
-      max.x = x + size.x - 1
-      max.z = z + size.z - 1
+  min.x = x
+  min.z = z
+  max.x = x + size.x
+  max.z = z + size.z
 
-      ok = true
-      for k, id in pairs(self.children) do
-        other = Site.get(id)
-        if stm.rectangles_overlap(min,max,other.min,other.max) then
-          ok = false
-          break
-        end
-      end
-
-      if ok then
-        child.pos = vector.new(
-          math.floor(min.x + (max.x - min.x)/2),
-          math.floor(min.y),
-          math.floor(min.z + (max.z - min.z)/2)
-        )
-        child.min = min
-        child.max = max
-        table.insert(self.children, child.id)
-        return true
-      end
+  ok = true
+  for k, id in pairs(self.children) do
+    other = Site.get(id)
+    if stm.rectangles_overlap(min,max,other.min,other.max) then
+      ok = false
+      break
     end
+  end
+
+  if ok then
+    child.pos = vector.new(
+      math.floor(min.x + (max.x - min.x)/2),
+      math.floor(min.y),
+      math.floor(min.z + (max.z - min.z)/2)
+    )
+    child.min = min
+    child.max = max
+    table.insert(self.children, child.id)
+    return true
   end
 end
 

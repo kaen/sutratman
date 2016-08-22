@@ -218,7 +218,7 @@ end
 
 --- Return the first element (v) of `t` for which `f(v, k)` returns true
 function stm.find_one(t, f)
-  for _,v in pairs(t) do
+  for k,v in pairs(t) do
     if f(v, k) then return v end
   end
 end

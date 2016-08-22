@@ -1,5 +1,5 @@
 local function pick_style(self)
-  local schematics = {'house1', 'house2', 'house3'}
+  local schematics = {'house_human1', 'house_human2', 'house_human3'}
   self.style = stm.pick_one(schematics)
   return stm.schematic_size(self.style)
 end

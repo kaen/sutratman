@@ -6,7 +6,7 @@ local function find_suitable_location(self, hint)
   local max = vector.new(pos.x + size, pos.y, pos.z + size)
   local variance, y_min, y_max = MapData.get_surface_variance(min, max)
 
-  if variance > max_variance then return nil end
+  -- if variance > max_variance then return nil end
 
   self.pos = vector.new(pos.x, y_min, pos.z)
   self.min = vector.new(pos.x - size, y_min, pos.z - size)
@@ -18,6 +18,22 @@ local function create_initial_build_orders(self)
   local order = BuildOrder.from_generator(self.min, self.max, 'flatland')
   BuildOrder.register(order)
   self:add_order(order)
+
+  local fountain = Site.new()
+  fountain.type = 'fountain'
+  local found_space = self:request_space_randomly(fountain, stm.schematic_size('fountain'))
+  if found_space then
+    fountain:create_initial_build_orders()
+    Site.register(fountain)
+  end
+
+  local temple = Site.new()
+  temple.type = 'temple_human'
+  local found_space = self:request_space_randomly(temple, stm.schematic_size('temple_human'))
+  if found_space then
+    temple:create_initial_build_orders()
+    Site.register(temple)
+  end
 end
 
 return {

@@ -9,6 +9,12 @@ return {
     char.path_wait = 0
   end,
   perform = function(char, state)
+    -- teleport when in fast mode
+    if Parameters.fast then
+      char.position = state.dest
+      return true
+    end
+
     if state.state == PATH then
       -- couldn't path due to timeout, try again later
       if stm.data.time < char.path_wait then return end

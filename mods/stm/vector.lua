@@ -54,6 +54,13 @@ function vector.distance(a, b)
 	return math.hypot(x, math.hypot(y, z))
 end
 
+function vector.distance_squared(a, b)
+	local x = a.x - b.x
+	local y = a.y - b.y
+	local z = a.z - b.z
+	return x*x + y*y + z*z
+end
+
 function vector.direction(pos1, pos2)
 	local x_raw = pos2.x - pos1.x
 	local y_raw = pos2.y - pos1.y
@@ -129,6 +136,12 @@ function vector.divide(a, b)
 			y = a.y / b,
 			z = a.z / b}
 	end
+end
+
+function vector.midpoint(a,b)
+  local min = vector.new(math.min(a.x, b.x), math.min(a.y,b.y), math.min(a.z,b.z))
+  local max = vector.new(math.max(a.x, b.x), math.max(a.y,b.y), math.max(a.z,b.z))
+  return vector.add(min, vector.divide(vector.subtract(max, min), 2))
 end
 
 function vector.rotateY(v, r)

@@ -120,7 +120,7 @@ function Site:allocate_space(child, size, x, z)
   if ok then
     child.pos = vector.new(
       math.floor(min.x + (max.x - min.x)/2),
-      math.floor(min.y),
+      self:lowest_nearest_surface_height(min, max),
       math.floor(min.z + (max.z - min.z)/2)
     )
     child.min = min
@@ -128,6 +128,21 @@ function Site:allocate_space(child, size, x, z)
     table.insert(self.children, child.id)
     return true
   end
+end
+
+function Site:lowest_nearest_surface_height(min, max)
+  local lowest = math.huge
+  for x=min.x,max.x do
+    for z=min.z,max.z do
+      lowest = math.min(lowest, self:nearest_surface_height(x,z))
+    end
+  end
+  return lowest
+end
+
+function Site:nearest_surface_height(x,z)
+  local candidates = MapData.get_all_surface_pos(vector.new(x,self.pos.y,z))
+  return stm.closest_to(self.pos, candidates).y
 end
 
 function Site:get_def()

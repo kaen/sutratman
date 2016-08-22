@@ -1,12 +1,13 @@
 stm.MAP_BLOCK_SIZE = 80
-stm.XSIZE = stm.MAP_BLOCK_SIZE * 1
+stm.XSIZE = stm.MAP_BLOCK_SIZE * 2
 stm.YSIZE = stm.MAP_BLOCK_SIZE * 1
-stm.ZSIZE = stm.MAP_BLOCK_SIZE * 1
+stm.ZSIZE = stm.MAP_BLOCK_SIZE * 2
 
 stm.data.mapdata_block_offset = nil
 stm.data.mapdata_expected_blocks = stm.XSIZE * stm.YSIZE * stm.ZSIZE * 8 / math.pow(stm.MAP_BLOCK_SIZE, 3)
 stm.data.mapdata_generated_blocks = 0
 stm.data.mapdata_generation_callbacks_fired = false
+stm.data.mapdata_heightmaps = { }
 
 MapData = { }
 MapData.generation_callbacks = { }
@@ -180,6 +181,9 @@ function MapData.get_extents()
 end
 
 function MapData.on_generated(minp, maxp, blockseed)
+  -- local heightmap = minetest.get_mapgen_object("heightmap")
+  -- local index = stm.pos_to_int(stm.float_to_node(vector.midpoint(minp, maxp)))
+  -- stm.data.mapdata_heightmaps[index] = heightmap
   if type(stm.data.mapdata_block_offset) ~= 'table' then
     stm.data.mapdata_block_offset = {
       x = minp.x % 80,
@@ -189,6 +193,7 @@ function MapData.on_generated(minp, maxp, blockseed)
   end
 
   local min_extent, max_extent = MapData.get_extents()
+  minetest.emerge_area(min_extent, max_extent)
   if minp.x >= min_extent.x and
      maxp.x <= max_extent.x and
      minp.y >= min_extent.y and
@@ -197,6 +202,7 @@ function MapData.on_generated(minp, maxp, blockseed)
      maxp.z <= max_extent.z
   then
     stm.data.mapdata_generated_blocks = 1 + stm.data.mapdata_generated_blocks
+    -- print("blocks generated:", stm.data.mapdata_generated_blocks, stm.data.mapdata_expected_blocks)
   end
 
   if stm.data.mapdata_generated_blocks == stm.data.mapdata_expected_blocks and not stm.data.mapdata_generation_callbacks_fired then

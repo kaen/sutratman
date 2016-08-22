@@ -16,6 +16,8 @@ return {
     local site = Site.new({ type = Race.get(char.race).municipality_type })
     if not site:find_suitable_location(char:get_position()) then
       -- Couldn't find a good spot, return without registering the site
+      -- wander a bit in case we need to try again
+      char:push_task('wander', { stop = stm.data.time + Parameters.establish_municipality_wander_time })
       return
     end
 

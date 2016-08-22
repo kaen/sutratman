@@ -31,7 +31,7 @@ local function savedata()
 end
 
 if minetest then
-  minetest.register_on_shutdown(savedata)
+  -- minetest.register_on_shutdown(savedata)
   -- minetest.after(0, loaddata)
 end
 

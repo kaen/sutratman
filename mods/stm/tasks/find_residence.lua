@@ -10,7 +10,7 @@ return {
     if state.state == BEGIN then
       -- find the closest municipality
       local site = Site.get_closest(char:get_position(), function(x)
-        return x.is_municipality
+        return x.type == char:get_race().municipality_type
       end)
 
       if not site then

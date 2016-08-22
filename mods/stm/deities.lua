@@ -38,6 +38,7 @@ function Deity:create_mortals()
   local count = Parameters.minimum_eden_mortals + math.random(Parameters.extra_eden_mortals)
   local eden = self:pick_eden()
   local race = self:pick_race()
+  if not race then return end
   race.creator = self.id
 
   for i=1,count do
@@ -60,7 +61,12 @@ end
 function Deity:pick_eden()
   -- TODO: Pick a spot that the deity in question would actually like
   -- return MapData.get_surface_pos({x=0,y=0,z=0})
-  return { x = 0, y = 0, z = 0 }
+  local min, max = MapData.get_extents()
+  min.x = min.x + Parameters.minimum_municipality_distance
+  max.x = max.x - Parameters.minimum_municipality_distance
+  min.z = min.z + Parameters.minimum_municipality_distance
+  max.z = max.z - Parameters.minimum_municipality_distance
+  return { x = math.random(min.x, max.x), y = 0, z = math.random(min.z, max.z) }
 end
 
 function Deity.populate()

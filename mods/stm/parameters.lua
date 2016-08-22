@@ -8,11 +8,13 @@ Parameters.fast = true
 --- Half size of the astral plane
 Parameters.astral_plane_half_size = 10
 --- Number of deities to create
-Parameters.deity_count = 1
+Parameters.deity_count = 3
+--- Game seconds to wander when failed to establish municipality
+Parameters.establish_municipality_wander_time = 10 * stm.TIME_SCALE
 --- Half size of new municipalities (in number of nodes)
 Parameters.municipality_half_size = 15
 --- Minimum spacing when establishing new municipalities
-Parameters.minimum_municipality_distance = 100
+Parameters.minimum_municipality_distance = 50
 --- Minimum number of mortals spawned by a creator deity
 Parameters.minimum_eden_mortals = 5
 --- Max attempts allowed when randomly choosing a spot for a child site

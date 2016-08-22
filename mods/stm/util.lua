@@ -67,6 +67,20 @@ function stm.dump(x, depth)
   end
 end
 
+--- Returns the vector in haystack with the shortest distance to needle
+function stm.closest_to(needle, haystack)
+  local best_dist = math.huge
+  local best = nil
+  for k,v in pairs(haystack) do
+    local dist = vector.distance_squared(needle, v)
+    if dist < best_dist then
+      best_dist = dist
+      best = v
+    end
+  end
+  return best
+end
+
 -- obviously assumes AABB pairs, ignores y coordinates
 function stm.rectangles_overlap(min1,max1,min2,max2)
   if min1.x > max2.x or min2.x > max1.x then return false end

@@ -48,7 +48,9 @@ for k,v in pairs(_G) do
                     end
                 end
                 math.randomseed(1337)
-               if oldFunction then oldFunction() end
+                Parameters.fast = true
+                Parameters.skip = false
+                if oldFunction then oldFunction() end
             end
         end)()
     end

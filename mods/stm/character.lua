@@ -142,7 +142,7 @@ end
 function Character:perform_tasks()
   local task, task_def = self:get_current_task()
   if not task then return nil end
-  print(task.name)
+  -- print(task.name)
 
   if not task.state.planned then
     task_def.plan(self, task.state)
@@ -240,6 +240,12 @@ end
 --- Set the character's velocity to 0.
 function Character:stop()
   self.velocity = vector.new(0,0,0)
+end
+
+function Character:find_compatible_municipality()
+  return Site.get_closest(self:get_position(), function(x)
+    return x.type == self:get_race().municipality_type
+  end)
 end
 
 if _G.minetest then

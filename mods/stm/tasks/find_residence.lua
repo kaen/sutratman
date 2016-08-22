@@ -9,10 +9,7 @@ return {
   perform = function(char, state)
     if state.state == BEGIN then
       -- find the closest municipality
-      local site = Site.get_closest(char:get_position(), function(x)
-        return x.type == char:get_race().municipality_type
-      end)
-
+      local site = char:find_compatible_municipality()
       if not site then
         -- there's no where to go, better start our own
         char:push_task('establish_municipality')

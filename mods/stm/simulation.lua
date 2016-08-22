@@ -49,7 +49,7 @@ function Simulation.simulate(n)
   while n > 0 do
     Simulation.step(step)
     n = n - step
-    if os.clock() - start > (1/60) then return end
+    if Parameters.skip and os.clock() - start > (1/60) then return end
   end
 end
 

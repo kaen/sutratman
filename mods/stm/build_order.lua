@@ -21,20 +21,21 @@ function BuildOrder.from_schematic(base, name)
     pos = vector.add(pos, base)
     translated_nodes[stm.pos_to_int(pos)] = n
   end
-  return BuildOrder.create(translated_nodes)
+  return BuildOrder.create(translated_nodes, name)
 end
 
 function BuildOrder.from_generator(min, max, name)
   local spec = dofile(stm.base_path .. "/generators/" .. name .. ".lua")
-  return BuildOrder.create(spec(min,max))
+  return BuildOrder.create(spec(min,max), name)
 end
 
 --- Creates a build order from a schematic function.
 -- @param spec mapping of integers to node objects (used with set_node).
 -- The keys are passed to stm.int_to_pos, and the result is expected to be the absolute position to pass to set_node
 -- The values are passed as-is to set_node
-function BuildOrder.create(spec)
+function BuildOrder.create(spec, source)
   local result = BuildOrder.new()
+  result.source = source
 
   if type(spec) == 'function' then
     spec = spec(min,max)

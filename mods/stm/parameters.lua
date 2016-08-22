@@ -5,6 +5,8 @@ Parameters = { }
 
 --- When true, characters teleport to destinations immediately
 Parameters.fast = true
+--- When true, bails out of simulation to keep up with target frame rate
+Parameters.skip = true
 --- Half size of the astral plane
 Parameters.astral_plane_half_size = 10
 --- Number of deities to create

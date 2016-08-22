@@ -8,8 +8,9 @@ return {
   end,
   perform = function(char, state)
     if state.state == ESTABLISH then
-      local closest = Site.get_closest(char:get_position(), function(x)
-          return x.is_municipality == true
+      if char:find_compatible_municipality() then return false end
+      local site = Site.get_closest(char:get_position(), function(x)
+        return x.is_municipality
       end)
 
       -- we're too close to another town
@@ -30,11 +31,13 @@ return {
       char.municipality = site.id
       site:prepare_terrain()
       Site.register(site)
+      char:push_task('construct_site', { site = site.id })
       state.state = PREPARE_TERRAIN
     elseif state.state == PREPARE_TERRAIN then
       local site = Site.get(char.municipality)
       if site:is_complete() then
         site:create_initial_build_orders()
+        char:push_task('construct_site', { site = site.id })
         state.state = BUILD
       end
     elseif state.state == BUILD then

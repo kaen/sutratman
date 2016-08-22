@@ -14,11 +14,13 @@ local function find_suitable_location(self, hint)
   return true
 end
 
-local function create_initial_build_orders(self)
+local function prepare_terrain(self)
   local order = BuildOrder.from_generator(self.min, self.max, 'flatland')
   BuildOrder.register(order)
   self:add_order(order)
+end
 
+local function create_initial_build_orders(self)
   local fountain = Site.new()
   fountain.type = 'fountain'
   local found_space = self:request_space_randomly(fountain, stm.schematic_size('fountain'))
@@ -39,5 +41,6 @@ end
 return {
   is_municipality = true,
   find_suitable_location = find_suitable_location,
+  prepare_terrain = prepare_terrain,
   create_initial_build_orders = create_initial_build_orders
 }

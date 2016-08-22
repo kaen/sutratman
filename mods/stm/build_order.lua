@@ -71,12 +71,14 @@ function BuildOrder:take_job(pos)
   local best_job = nil
   for k,job in pairs(self.jobs) do
     if not job.taken or stm.data.time - job.taken > TASK_TIMEOUT then
-      local delta = vector.subtract(pos, job.pos)
-      local dist_squared = delta.x * delta.x + delta.z * delta.z
-      if dist_squared < best_dist then
-        best_dist = dist_squared
-        best_job = job
-      end
+      return job
+      -- TODO pick jobs better?
+      -- local delta = vector.subtract(pos, job.pos)
+      -- local dist_squared = delta.x * delta.x + delta.z * delta.z
+      -- if dist_squared < best_dist then
+      --   best_dist = dist_squared
+      --   best_job = job
+      -- end
     end
   end
 

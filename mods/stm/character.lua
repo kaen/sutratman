@@ -142,6 +142,7 @@ end
 function Character:perform_tasks()
   local task, task_def = self:get_current_task()
   if not task then return nil end
+  print(task.name)
 
   if not task.state.planned then
     task_def.plan(self, task.state)

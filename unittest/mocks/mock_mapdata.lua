@@ -52,6 +52,10 @@ function MapData.get_node_mock_wavy(pos)
   return { name = "default:stone" }
 end
 
+function MapData.emerge_area(min,max)
+  -- do nothing
+end
+
 minetest = minetest or { }
 minetest.registered_nodes = fixture('registered_nodes')
 

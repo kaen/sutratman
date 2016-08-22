@@ -45,9 +45,11 @@ end
 -- which equates to 1/60 of a real time second at standard scaling.
 function Simulation.simulate(n)
   local step = stm.TIME_SCALE / 60
+  local start = os.clock()
   while n > 0 do
     Simulation.step(step)
     n = n - step
+    if os.clock() - start > (1/60) then return end
   end
 end
 

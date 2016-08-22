@@ -180,6 +180,10 @@ function MapData.get_extents()
   return min, max
 end
 
+function MapData.emerge_area(min, max)
+  minetest.emerge_area(min, max)
+end
+
 function MapData.on_generated(minp, maxp, blockseed)
   -- local heightmap = minetest.get_mapgen_object("heightmap")
   -- local index = stm.pos_to_int(stm.float_to_node(vector.midpoint(minp, maxp)))
@@ -193,7 +197,7 @@ function MapData.on_generated(minp, maxp, blockseed)
   end
 
   local min_extent, max_extent = MapData.get_extents()
-  minetest.emerge_area(min_extent, max_extent)
+  MapData.emerge_area(min_extent, max_extent)
   if minp.x >= min_extent.x and
      maxp.x <= max_extent.x and
      minp.y >= min_extent.y and

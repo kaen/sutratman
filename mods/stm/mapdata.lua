@@ -217,5 +217,5 @@ end
 
 if minetest then
   minetest.register_on_generated(MapData.on_generated)
-  -- minetest.after(0, MapData.dump_registered_nodes)
+  minetest.after(0, MapData.dump_registered_nodes)
 end

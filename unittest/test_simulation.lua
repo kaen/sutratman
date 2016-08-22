@@ -12,32 +12,35 @@ function TestSimulation:testSimulate()
   Simulation.populate()
   Simulation.simulate(sim_time)
 
-  local town = nil
+  local human_town = nil
+  local goblin_town = nil
   local plane = nil
   for k,v in pairs(Site.all()) do
-    if v.type == 'municipality_human' then town = v end
+    if v.type == 'municipality_human' then human_town = v end
+    if v.type == 'municipality_goblin' then goblin_town = v end
     if v.type == 'astral_plane' then plane = v end
   end
 
+  assert(goblin_town)
   assert(plane)
-  local town_pos = town:get_position()
+  local human_town_pos = human_town:get_position()
 
   -- there should be at least 5 characters in the world, and all should be
-  -- residents of this town
+  -- residents of this human_town
   assert(stm.count_pairs(Character.all()) > 5)
   for k,v in pairs(Character.all()) do
     assertEquals(Race.get(v.race).name, 'human')
-    assertEquals(v.municipality, town.id)
-    if town.ruler ~= v.id then assert(v.residence) end
+    assertEquals(v.municipality, human_town.id)
+    if human_town.ruler ~= v.id then assert(v.residence) end
   end
 
-  -- the town should have a ruler
-  assert(Character.get(town.ruler))
+  -- the human_town should have a ruler
+  assert(Character.get(human_town.ruler))
 
-  -- the town should have lots of sub residences
-  assert(#town.children > 5)
-  local min = vector.new(town_pos.x - 5, town_pos.y, town_pos.z - 5)
-  local max = vector.new(town_pos.x + 5, town_pos.y, town_pos.z + 5)
+  -- the human_town should have lots of sub residences
+  assert(#human_town.children > 5)
+  local min = vector.new(human_town_pos.x - 5, human_town_pos.y, human_town_pos.z - 5)
+  local max = vector.new(human_town_pos.x + 5, human_town_pos.y, human_town_pos.z + 5)
 
   -- All build orders should be complete
   for k,v in pairs(BuildOrder.all()) do

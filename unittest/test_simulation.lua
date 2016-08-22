@@ -29,6 +29,7 @@ function TestSimulation:testSimulate()
   -- residents of a town
   assert(stm.count_pairs(Character.all()) > 5)
   for k,v in pairs(Character.all()) do
+    stm.dump(v)
     if human_town.ruler ~= v.id then assert(v.residence) end
   end
 

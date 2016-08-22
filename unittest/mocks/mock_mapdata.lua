@@ -28,7 +28,7 @@ function MapData.get_node_group_mock(name, group)
 end
 
 MapData.mock_data = { }
-function MapData.set_node_mock(pos, node)
+function MapData.set_node_raw_mock(pos, node)
   MapData.mock_data[pos_to_int(pos)] = node
 end
 
@@ -56,16 +56,26 @@ function MapData.emerge_area(min,max)
   -- do nothing
 end
 
+function MapData.get_surface_pos_mock(pos)
+  return vector.new(pos.x, 1, pos.z)
+end
+
 minetest = minetest or { }
 minetest.registered_nodes = fixture('registered_nodes')
 
 -- inject fake map data
+local mapgen_object_mocks = { }
+minetest.get_mapgen_object = function(k)
+  return mapgen_object_mocks[k]
+end
 local generated_blocks = fixture('generated_blocks')
 for _, args in ipairs(generated_blocks) do
+  mapgen_object_mocks.heightmap = args.heightmap
   MapData.on_generated(args.minp, args.maxp, args.blockseed)
 end
 
 MapData.walk_voxels = MapData.walk_voxels_mock
 MapData.get_node_group = MapData.get_node_group_mock
 MapData.get_node = MapData.get_node_mock
-MapData.set_node = MapData.set_node_mock
+MapData.set_node_raw = MapData.set_node_raw_mock
+MapData.get_surface_pos = MapData.get_surface_pos_mock

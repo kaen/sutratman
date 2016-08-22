@@ -90,6 +90,7 @@ end
 
 --- Mark a given job as complete
 function BuildOrder:complete_job(id)
+  if not self.jobs[id] then return end
   self.remaining = self.remaining - 1
   self.jobs[id] = nil
 end

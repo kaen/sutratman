@@ -7,55 +7,62 @@ stm.data.mapdata_block_offset = nil
 stm.data.mapdata_expected_blocks = stm.XSIZE * stm.YSIZE * stm.ZSIZE * 8 / math.pow(stm.MAP_BLOCK_SIZE, 3)
 stm.data.mapdata_generated_blocks = 0
 stm.data.mapdata_generation_callbacks_fired = false
-stm.data.mapdata_heightmaps = { }
+stm.data.mapdata_heightmap = { }
 
 MapData = { }
 MapData.generation_callbacks = { }
 function MapData.get_surface_pos(p)
-  local nearby_air_pos, crumbly_rating = nil
-  local min_extent, max_extent = MapData.get_extents()
-  local min = vector.new(p.x,min_extent.y,p.z)
-  local max = vector.new(p.x,max_extent.y,p.z)
-  local best_pos = {
-    x = -30000,
-    y = -30000,
-    z = -30000
-  }
+  local pos = stm.float_to_node(p)
+  local i = MapData.xz_hash(pos.x,pos.z)
+  local y = stm.data.mapdata_heightmap[i] + 1
+  local min, max = MapData.get_extents()
+  y = math.max(min.y, math.min(max.y, y))
+  return vector.new(pos.x,y,pos.z)
+  -- local nearby_air_pos, crumbly_rating = nil
+  -- local min_extent, max_extent = MapData.get_extents()
+  -- local min = vector.new(p.x,min_extent.y,p.z)
+  -- local max = vector.new(p.x,max_extent.y,p.z)
+  -- local best_pos = {
+  --   x = -30000,
+  --   y = -30000,
+  --   z = -30000
+  -- }
 
-  local fn = function(pos, name, cid)
-    if pos.y > best_pos.y then
-      if stm.is_solid({ name = name, cid = cid }) then
-        local node_above = MapData.get_node(vector.new(pos.x, pos.y+1, pos.z))
-        if not stm.is_solid(node_above) then
-          best_pos = pos
-        end
-      end
-    end
-  end
+  -- local fn = function(pos, name, cid)
+  --   if pos.y > best_pos.y then
+  --     if stm.is_solid({ name = name, cid = cid }) then
+  --       local node_above = MapData.get_node(vector.new(pos.x, pos.y+1, pos.z))
+  --       if not stm.is_solid(node_above) then
+  --         best_pos = pos
+  --       end
+  --     end
+  --   end
+  -- end
 
-  MapData.walk_voxels(min, max, fn)
-  best_pos.y = best_pos.y + 1
+  -- MapData.walk_voxels(min, max, fn)
+  -- best_pos.y = best_pos.y + 1
 
-  return best_pos
+  -- return best_pos
 end
 
 function MapData.get_all_surface_pos(p)
-  local min_extent, max_extent = MapData.get_extents()
-  local min = vector.new(p.x,min_extent.y,p.z)
-  local max = vector.new(p.x,max_extent.y,p.z)
-  local results = { }
+  return { MapData.get_surface_pos(p) }
+  -- local min_extent, max_extent = MapData.get_extents()
+  -- local min = vector.new(p.x,min_extent.y,p.z)
+  -- local max = vector.new(p.x,max_extent.y,p.z)
+  -- local results = { }
 
-  local fn = function(pos, name, cid)
-    if stm.is_solid({ name = name, cid = cid }) then
-      local node_above = MapData.get_node(vector.new(pos.x, pos.y+1, pos.z))
-      if not stm.is_solid(node_above) then
-        table.insert(results, vector.new(pos.x, pos.y + 1, pos.z))
-      end
-    end
-  end
+  -- local fn = function(pos, name, cid)
+  --   if stm.is_solid({ name = name, cid = cid }) then
+  --     local node_above = MapData.get_node(vector.new(pos.x, pos.y+1, pos.z))
+  --     if not stm.is_solid(node_above) then
+  --       table.insert(results, vector.new(pos.x, pos.y + 1, pos.z))
+  --     end
+  --   end
+  -- end
 
-  MapData.walk_voxels(min, max, fn)
-  return results
+  -- MapData.walk_voxels(min, max, fn)
+  -- return results
 end
 
 
@@ -128,6 +135,10 @@ function MapData.get_node(pos)
 end
 
 function MapData.set_node(pos, node)
+  MapData.set_node_raw(pos, node)
+end
+
+function MapData.set_node_raw(pos, node)
   minetest.set_node(pos, node)
 end
 
@@ -184,10 +195,24 @@ function MapData.emerge_area(min, max)
   minetest.emerge_area(min, max)
 end
 
+--- Maps x,z to an integer value between 1 and xsize*zsize
+-- Used for indexing 2D map data tables, using this consecutive integer hash
+-- method causes lua to store the underlying table as a contiguous array in
+-- memory (rather than a sparse hash table), making access much faster.
+function MapData.xz_hash(x,z)
+  local min, max = MapData.get_extents()
+  local zsize = max.z - min.z + 1
+  assert(x >= min.x)
+  assert(x <= max.x)
+  assert(z >= min.z)
+  assert(z <= max.z)
+  x = x - min.x
+  z = z - min.z
+  return x * zsize + z + 1
+end
+
+local collected_block_data = { }
 function MapData.on_generated(minp, maxp, blockseed)
-  -- local heightmap = minetest.get_mapgen_object("heightmap")
-  -- local index = stm.pos_to_int(stm.float_to_node(vector.midpoint(minp, maxp)))
-  -- stm.data.mapdata_heightmaps[index] = heightmap
   if type(stm.data.mapdata_block_offset) ~= 'table' then
     stm.data.mapdata_block_offset = {
       x = minp.x % 80,
@@ -205,6 +230,24 @@ function MapData.on_generated(minp, maxp, blockseed)
      minp.z >= min_extent.z and
      maxp.z <= max_extent.z
   then
+    local heightmap = minetest.get_mapgen_object("heightmap")
+    local index = stm.pos_to_int(stm.float_to_node(vector.midpoint(minp, maxp)))
+    local heightmap_index = 1
+    if heightmap then
+      for z=minp.z,maxp.z do
+        for x=minp.x,maxp.x do
+          -- hashes collide from map blocks at different y levels, but we always
+          -- take the highest surface
+          local i = MapData.xz_hash(x,z)
+          local old_value = stm.data.mapdata_heightmap[i] or -math.huge
+          stm.data.mapdata_heightmap[i] = math.max(old_value, heightmap[heightmap_index])
+          heightmap_index = heightmap_index + 1
+        end
+      end
+    end
+    if Parameters.extract_mock_data then
+      table.insert(collected_block_data, { minp = minp, maxp = maxp, blockseed = blockseed, heightmap = heightmap })
+    end
     stm.data.mapdata_generated_blocks = 1 + stm.data.mapdata_generated_blocks
     -- print("blocks generated:", stm.data.mapdata_generated_blocks, stm.data.mapdata_expected_blocks)
   end
@@ -213,6 +256,10 @@ function MapData.on_generated(minp, maxp, blockseed)
     stm.data.mapdata_generation_callbacks_fired = true
     for _, callback in ipairs(MapData.generation_callbacks) do
       callback()
+    end
+    if Parameters.extract_mock_data then
+      table.insert(collected_block_data, { minp = minp, maxp = maxp, blockseed = blockseed, heightmap = heightmap })
+      stm.write_file('generated_blocks.lua', minetest.serialize(collected_block_data))
     end
   end
 end

@@ -17,7 +17,7 @@ function Soul.attach(player)
   if not astral_plane then return soul end
 
   if soul:get_char() then
-    soul:move_to_character()
+    soul:move_character()
   else
     soul:confine_to_astral_plane()
   end
@@ -51,7 +51,7 @@ function Soul:incarnate()
   local result = Character.new({ soul = self.id, race = race.id, materialized = true, pos = pos })
   self.current_character = result.id
   Character.register(result)
-  self:move_to_character()
+  self:move_character()
   -- TODO: set player model to match the new character
   return result
 end
@@ -77,12 +77,18 @@ function Soul:confine_to_astral_plane()
   end
 end
 
-function Soul:move_to_character()
-  self:get_player():setpos(self:get_char():get_position())
+function Soul:move_character()
+  if not self.followed then
+    self.followed = stm.pick_from_hash(Character.all())
+  end
+  self:get_char().pos = self:get_player():getpos()
+  -- self:get_player():setpos(self.followed:get_position())
 end
 
 function Soul:simulate(dt)
-  if not self.current_character then
+  if self:get_char() then
+    self:move_character()
+  else
     self:confine_to_astral_plane()
   end
 end

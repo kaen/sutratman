@@ -50,7 +50,7 @@ return {
       state.state = WORK
 
     elseif state.state == WORK then
-      table.insert(stm.data.set_node_queue, { pos = state.job.pos, node = state.job.node })
+      MapData.set_node(state.job.pos, state.job.node)
       BuildOrder.get(state.order):complete_job(state.job.id)
       state.state = GET_TASK
     end

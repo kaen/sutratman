@@ -44,7 +44,7 @@ function Deity:create_mortals()
   for i=1,count do
     local char = Character.new({ race = race.id })
     char.pos = MapData.get_surface_pos(MapData.random_point_near(eden, 10))
-    char:push_task('wander')
+    -- char:push_task('wander')
     char:push_task('find_residence')
     Character.register(char)
   end

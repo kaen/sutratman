@@ -141,8 +141,9 @@ function Site:lowest_nearest_surface_height(min, max)
 end
 
 function Site:nearest_surface_height(x,z)
-  local candidates = MapData.get_all_surface_pos(vector.new(x,self.pos.y,z))
-  return stm.closest_to(self.pos, candidates).y
+  -- local candidates = MapData.get_all_surface_pos(vector.new(x,self.pos.y,z))
+  -- return stm.closest_to(self.pos, candidates).y
+  return MapData.get_surface_pos(vector.new(x,self.pos.y,z)).y
 end
 
 function Site:get_def()

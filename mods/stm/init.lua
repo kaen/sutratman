@@ -1,4 +1,5 @@
 local SOURCES = {
+  'profi.lua',
   'serializable.lua',
   'vector.lua',
   'data.lua',

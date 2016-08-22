@@ -237,6 +237,15 @@ function stm.find_one(t, f)
   end
 end
 
+function stm.write_file(name, str)
+  assert(type(str) == 'string')
+  local file = io.open(name, "w")
+  if not file then return false end
+  file:write(str)
+  io.close(file)
+  return true
+end
+
 if minetest then
   stm.base_path = minetest.get_modpath('stm')
 else

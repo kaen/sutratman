@@ -70,7 +70,7 @@ function Character:update_physics(dt)
   -- -- TODO: better unsticking logic
   self.on = node
   if stm.is_solid(node) then
-    self.pos.y = (MapData.get_surface_pos(self.pos) or vector.new(0,0,0)).y - 0.50 + PHYSICS_FUZZ
+    self.pos.y = self.pos.y + 0.1
     self.on_ground = false
     self.acceleration.y = 0
     self.velocity.y = 0
@@ -113,7 +113,7 @@ function Character:update_physics(dt)
           self.acceleration.y = 0
           self.velocity.y = 10 * stm.TIME_SCALE
           self.pos.y = self.pos.y + 1
-          self.on_ground = false
+          -- self.on_ground = false
           return
         end
       end
@@ -147,10 +147,12 @@ function Character:perform_tasks()
   if not task.state.planned then
     task_def.plan(self, task.state)
     task.state.planned = true
+    task.start = stm.data.time
   end
 
   local result = task_def.perform(self, task.state)
   if result == true or result == false then
+    print(task.name, result, stm.data.time - task.start)
     self.last_task_result = result
     self:pop_task(task)
   end
@@ -170,12 +172,18 @@ end
 -- should be throttled by any client code.
 -- @return the result of `minetest.find_path`
 function Character:get_path_to(pos)
+  print(self.on_ground)
   if not self.on_ground then return end
   if not (minetest and minetest.find_path) then return { pos } end
   pos.x = pos.x
   pos.y = pos.y
   pos.z = pos.z
-  return minetest.find_path(stm.float_to_node(self.pos), pos, 10, 1, 3, 'A*')
+  local dist = 2 * math.ceil(vector.distance(self.pos, pos))
+  local result = minetest.find_path(stm.float_to_node(self.pos), pos, dist, 1, 3, 'A*')
+  print(result)
+  stm.dump(pos)
+  stm.dump(self.pos)
+  return result
 end
 
 --- Add a task definition to the end of the task queue
@@ -273,9 +281,13 @@ if _G.minetest then
     },
     view_range = 8,
     get_staticdata = function(self)
+      print('static', self.char_id)
+      stm.dump(self.object:getpos())
       return tostring(self.char_id)
     end,
     on_activate = function(self, data)
+      print('activate', data)
+      stm.dump(self.object:getpos())
       self.char_id = tonumber(data)
     end,
     on_rightclick = function(self, clicker)
@@ -299,29 +311,27 @@ if _G.minetest then
     end,
     on_step = function(self, dt)
       local char = self:get_char()
-      if char then
-        self.object:moveto(char:get_position())
-        self.object:setvelocity(char.velocity)
-        if char.velocity.x == 0 and char.velocity.y == 0 and char.velocity.z == 0 then
-          if self.animation.current ~= 'stand' then
-            self.object:set_animation(
-              {x = self.animation.stand_start,y = self.animation.stand_end},
-              self.animation.speed_normal, 0
-            )
-            self.animation.current = "stand"
-          end
-        else
-          if self.animation.current ~= 'walk' then
-            self.object:set_animation(
-              {x = self.animation.walk_start,y = self.animation.walk_end},
-              self.animation.speed_normal, 0
-            )
-            self.animation.current = "walk"
-          end
+      self.object:moveto(char:get_position())
+      self.object:setvelocity(char.velocity)
+      if char.velocity.x == 0 and char.velocity.y == 0 and char.velocity.z == 0 then
+        if self.animation.current ~= 'stand' then
+          self.object:set_animation(
+            {x = self.animation.stand_start,y = self.animation.stand_end},
+            self.animation.speed_normal, 0
+          )
+          self.animation.current = "stand"
         end
-        self.object:setacceleration(char.acceleration)
-        self.object:setyaw(char.yaw-math.pi/2)
+      else
+        if self.animation.current ~= 'walk' then
+          self.object:set_animation(
+            {x = self.animation.walk_start,y = self.animation.walk_end},
+            self.animation.speed_normal, 0
+          )
+          self.animation.current = "walk"
+        end
       end
+      self.object:setacceleration(char.acceleration)
+      self.object:setyaw(char.yaw-math.pi/2)
     end
 })
 end

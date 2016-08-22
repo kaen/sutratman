@@ -32,3 +32,15 @@ function TestMapData:testMapGenerationWatchdogIncomplete()
   end
   assert(not done)
 end
+
+function TestMapData:testXZHash()
+  local min, max = MapData.get_extents()
+  local index = 1
+  for x=min.x,max.x do
+    for z=min.z,max.z do
+      local result = MapData.xz_hash(x,z)
+      assert(index == result)
+      index = index + 1
+    end
+  end
+end

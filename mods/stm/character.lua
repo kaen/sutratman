@@ -41,7 +41,11 @@ end
 
 --- Mark a character as dead and send on-death messages
 function Character:die()
+  local was_dead_already = self.dead
   self.dead = true
+  if not was_dead_already and self:get_soul() then
+    self:get_soul():excarnate()
+  end
 end
 
 --- Get a string describing this character

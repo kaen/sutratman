@@ -216,6 +216,13 @@ function stm.int_to_pos(i)
   return pos;
 end
 
+--- Return the first element (v) of `t` for which `f(v, k)` returns true
+function stm.find_one(t, f)
+  for _,v in pairs(t) do
+    if f(v, k) then return v end
+  end
+end
+
 if minetest then
   stm.base_path = minetest.get_modpath('stm')
 else

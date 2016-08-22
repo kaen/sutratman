@@ -22,6 +22,7 @@ end
 
 function Simulation.create_astral_plane()
   local min_extent, max_extent = MapData.get_extents() 
+  local pos = vector.new(0, max_extent.y + 10 + 1, 0)
   local min = vector.new(
     -Parameters.astral_plane_half_size,
     max_extent.y + 10,
@@ -32,9 +33,10 @@ function Simulation.create_astral_plane()
     max_extent.y + 10 + Parameters.astral_plane_half_size,
     Parameters.astral_plane_half_size
   )
-  local site = Site.new({ type = 'astral_plane', min = min, max = max })
+  local site = Site.new({ type = 'astral_plane', min = min, max = max, pos = pos })
   Site.register(site)
   site:create_initial_build_orders()
+  stm.data.astral_plane = site.id
   BuildOrder.get(site.orders[1]):complete_immediately()
 end
 
@@ -62,6 +64,10 @@ end
 function Simulation.step(dt)
   stm.data.set_node_queue = { }
   stm.data.time = stm.data.time + dt
+
+  for k,soul in pairs(Soul.all()) do
+    soul:simulate(dt)
+  end
 
   for k,char in pairs(Character.all()) do
     char:simulate(dt)

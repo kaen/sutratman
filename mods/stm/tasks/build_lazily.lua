@@ -7,6 +7,7 @@ return {
     state.state = FIND_PATH
   end,
   perform = function(char, state)
+    if Parameters.fast then BuildOrder.get(state.order):complete_immediately() end
     if BuildOrder.get(state.order):is_complete() then return true end
 
     if state.state == FIND_PATH then

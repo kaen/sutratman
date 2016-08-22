@@ -5,7 +5,7 @@ function TestSimulation:testPopulate()
 end
 
 function TestSimulation:testSimulate()
-  local sim_time = 0.05 *24*60*60
+  local sim_time = 0.0005 *24*60*60
   -- TODO: uncomment this line when physics stop being screwy
   -- MapData.get_node = MapData.get_node_mock_wavy
 

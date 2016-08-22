@@ -45,7 +45,7 @@ end
 --- Create a new character and spawn the player into the simulation
 function Soul:incarnate()
   local race = stm.pick_from_hash(Race.all())
-  local site = stm.find_one(Site.all(), function(x) return x.is_municipality end)
+  local site = stm.find_one(Site.all(), function(x) return x.type == race.municipality_type end)
   local pos = nil
   if site then pos = site:get_position() end
   local result = Character.new({ soul = self.id, race = race.id, materialized = true, pos = pos })

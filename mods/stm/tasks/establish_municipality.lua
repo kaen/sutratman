@@ -44,8 +44,8 @@ return {
       local site = Site.get(char.municipality)
       if site:is_complete() then
         char:push_task("rule_municipality", { site = site.id })
+        return true
       end
     end
-    return true
   end
 }

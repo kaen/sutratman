@@ -24,6 +24,11 @@ function Soul.attach(player)
   return soul
 end
 
+function Soul.on_die_or_respawn(player)
+  local soul = Soul.find_or_create(player)
+  soul:excarnate()
+end
+
 --- Find or a create a Soul instance for this player
 -- Always returns the same Soul instance for a given player name
 function Soul.find_or_create(player)
@@ -40,9 +45,13 @@ end
 --- Create a new character and spawn the player into the simulation
 function Soul:incarnate()
   local race = stm.pick_from_hash(Race.all())
-  local result = Character.new({ soul = self.id, race = race.id, materialized = true })
+  local site = stm.find_one(Site.all(), function(x) return x.is_municipality end)
+  local pos = nil
+  if site then pos = site:get_position() end
+  local result = Character.new({ soul = self.id, race = race.id, materialized = true, pos = pos })
   self.current_character = result.id
   Character.register(result)
+  self:move_to_character()
   -- TODO: set player model to match the new character
   return result
 end
@@ -50,10 +59,12 @@ end
 --- Kill any existing character for this soul and remove player from simulation
 function Soul:excarnate()
   local char = self:get_char()
-  char:die()
+  if char then
+    char:die()
+    char.materialized = false
+  end
   self:confine_to_astral_plane()
   self.current_character = nil
-  char.materialized = false
   -- TODO set player model to an amorphous soul-like thing
   -- TODO move player to astral plane
 end
@@ -86,4 +97,10 @@ end
 
 if minetest and minetest.register_on_joinplayer then
   minetest.register_on_joinplayer(Soul.attach)
+  minetest.register_on_dieplayer(Soul.on_die_or_respawn)
+  minetest.register_on_respawnplayer(Soul.on_die_or_respawn)
+  minetest.register_chatcommand('incarnate', { func = function(name)
+    local soul = Soul.attach(minetest.get_player_by_name(name))
+    if not soul:get_char() then soul:incarnate() end
+  end})
 end

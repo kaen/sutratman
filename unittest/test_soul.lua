@@ -94,4 +94,12 @@ function TestSoul:testAttachNoAstralPlane()
   local player = Soul.get_player()
   local subject = Soul.attach(player)
   assert(subject.name == 'testplayer')
+
+  Simulation.populate()
+
+  local char = subject:incarnate()
+  assert(subject:get_char() == char)
+  assert(char:get_soul() == subject)
+  assert(char:get_race().name == 'human')
+  assert(char:is_materialized())
 end

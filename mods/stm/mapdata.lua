@@ -254,9 +254,11 @@ function MapData.on_generated(minp, maxp, blockseed)
 
   if stm.data.mapdata_generated_blocks == stm.data.mapdata_expected_blocks and not stm.data.mapdata_generation_callbacks_fired then
     stm.data.mapdata_generation_callbacks_fired = true
-    for _, callback in ipairs(MapData.generation_callbacks) do
-      callback()
-    end
+    minetest.after(1,function()
+      for _, callback in ipairs(MapData.generation_callbacks) do
+        callback()
+      end
+    end)
     if Parameters.extract_mock_data then
       table.insert(collected_block_data, { minp = minp, maxp = maxp, blockseed = blockseed, heightmap = heightmap })
       stm.write_file('generated_blocks.lua', minetest.serialize(collected_block_data))
@@ -270,6 +272,14 @@ function MapData.dump_registered_nodes()
     file:write(minetest.serialize(minetest.registered_nodes))
     io.close(file)
   end
+end
+
+function MapData.pos_to_block(pos)
+  local min, max = MapData.get_extents()
+  local x = math.floor((pos.x - min.x)/ 16)
+  local y = math.floor((pos.y - min.y)/ 16)
+  local z = math.floor((pos.z - min.z)/ 16)
+  return vector.new(x,y,z)
 end
 
 if minetest then

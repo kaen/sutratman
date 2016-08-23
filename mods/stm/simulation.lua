@@ -67,8 +67,18 @@ function Simulation.step(dt)
   stm.data.set_node_queue = { }
   stm.data.time = stm.data.time + dt
 
+  Soul.probably_active_blocks = { }
   for k,soul in pairs(Soul.all()) do
     soul:simulate(dt)
+    local block = MapData.pos_to_block(soul:get_player():getpos())
+    for dx=-1,1 do
+      for dy=-1,1 do
+        for dz=-1,1 do
+          local i = stm.pos_to_int(block)
+          Soul.probably_active_blocks[i] = true
+        end
+      end
+    end
   end
 
   for k,char in pairs(Character.all()) do
@@ -83,10 +93,10 @@ end
 if minetest then
   table.insert(MapData.generation_callbacks, function()
     Simulation:populate()
-    for k,v in pairs(Character.all()) do
-      v:materialize()
-    end
-    print("materialized")
+    -- for k,v in pairs(Character.all()) do
+    --   v:materialize()
+    -- end
+    -- print("materialized")
     minetest.register_globalstep(function(dt) Simulation.simulate(Simulation.real_to_game(dt)) end)
   end)
   minetest.after(1, function()

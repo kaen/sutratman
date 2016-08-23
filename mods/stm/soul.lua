@@ -49,6 +49,7 @@ function Soul:incarnate()
   local pos = nil
   if site then pos = site:get_position() end
   local result = Character.new({ soul = self.id, race = race.id, materialized = true, pos = pos })
+  self:get_player():setpos(result:get_position())
   self.current_character = result.id
   Character.register(result)
   self:move_character()

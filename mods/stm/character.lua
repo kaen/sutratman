@@ -58,6 +58,14 @@ end
 function Character:simulate(dt)
   self:perform_tasks(dt)
   self:update_physics(dt)
+
+  if not self.materialized then
+    local block = MapData.pos_to_block(self.pos)
+    local i = stm.pos_to_int(block)
+    if Soul.probably_active_blocks[i] then
+      self:materialize()
+    end
+  end
 end
 
 local PHYSICS_FUZZ = 0.01
@@ -113,7 +121,7 @@ function Character:update_physics(dt)
           self.acceleration.y = 0
           self.velocity.y = 10 * stm.TIME_SCALE
           self.pos.y = self.pos.y + 1
-          -- self.on_ground = false
+          self.on_ground = false
           return
         end
       end
@@ -152,7 +160,7 @@ function Character:perform_tasks()
 
   local result = task_def.perform(self, task.state)
   if result == true or result == false then
-    print(task.name, result, stm.data.time - task.start)
+    -- print(task.name, result, stm.data.time - task.start)
     self.last_task_result = result
     self:pop_task(task)
   end
@@ -172,17 +180,17 @@ end
 -- should be throttled by any client code.
 -- @return the result of `minetest.find_path`
 function Character:get_path_to(pos)
-  print(self.on_ground)
-  if not self.on_ground then return end
+  -- print(self.on_ground)
+  -- if not self.on_ground then return end
   if not (minetest and minetest.find_path) then return { pos } end
   pos.x = pos.x
   pos.y = pos.y
   pos.z = pos.z
-  local dist = 2 * math.ceil(vector.distance(self.pos, pos))
+  local dist = math.ceil(vector.distance(self.pos, pos))
   local result = minetest.find_path(stm.float_to_node(self.pos), pos, dist, 1, 3, 'A*')
-  print(result)
-  stm.dump(pos)
-  stm.dump(self.pos)
+  -- print(result)
+  -- stm.dump(pos)
+  -- stm.dump(self.pos)
   return result
 end
 
@@ -216,8 +224,10 @@ end
 
 --- Create the minetest entity that represents this character.
 function Character:materialize()
+  print('materialize', self.id)
   self.materialized = true
   local entity = minetest.add_entity(self.pos, 'stm:character')
+  print(entity)
   entity:get_luaentity().char_id = self.id
 end
 
@@ -279,7 +289,7 @@ if _G.minetest then
       walk_end = 187,
       current = 'stand'
     },
-    view_range = 8,
+    view_range = 100,
     get_staticdata = function(self)
       print('static', self.char_id)
       stm.dump(self.object:getpos())
@@ -288,7 +298,7 @@ if _G.minetest then
     on_activate = function(self, data)
       print('activate', data)
       stm.dump(self.object:getpos())
-      self.char_id = tonumber(data)
+      if not self.char_id then self.char_id = tonumber(data) end
     end,
     on_rightclick = function(self, clicker)
       stm.dump(self:get_char())
@@ -310,7 +320,9 @@ if _G.minetest then
       return self.char
     end,
     on_step = function(self, dt)
+      if not self.init then self.init = true ; return end
       local char = self:get_char()
+      if not char then return end
       self.object:moveto(char:get_position())
       self.object:setvelocity(char.velocity)
       if char.velocity.x == 0 and char.velocity.y == 0 and char.velocity.z == 0 then
